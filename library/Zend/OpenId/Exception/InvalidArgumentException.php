@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Zend Framework
  *
@@ -15,44 +14,23 @@
  *
  * @category   Zend
  * @package    Zend_OpenId
- * @copyright  Copyright (c) 2005-2011 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 
 /**
  * @namespace
  */
-namespace Zend\OpenId;
+namespace Zend\OpenId\Exception;
 
 /**
- * Exception class for Zend\OpenId
- *
- * @uses       \Exception
  * @category   Zend
  * @package    Zend_OpenId
- * @copyright  Copyright (c) 2005-2011 Zend Technologies USA Inc. (http://www.zend.com)
+ * @uses       \Zend\OpenId\Exception
+ * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class Exception extends \Exception
-{
-
-    /**
-     * The specified digest algotithm is not supported by this PHP installation
-     */
-    const UNSUPPORTED_DIGEST    = 1;
-
-    /**
-     * The long math arithmetick is not supported by this PHP installation
-     */
-    const UNSUPPORTED_LONG_MATH = 2;
-
-    /**
-     * Internal long math arithmetic error
-     */
-    const ERROR_LONG_MATH       = 3;
-
-    /**
-     * Iternal storage error
-     */
-    const ERROR_STORAGE         = 4;
-}
+class InvalidArgumentException
+    extends \InvalidArgumentException
+    implements \Zend\OpenId\Exception
+{}
