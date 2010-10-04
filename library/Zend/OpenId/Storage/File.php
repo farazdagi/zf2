@@ -40,6 +40,7 @@ use Zend\OpenId,
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 class File 
+    extends AbstractStorage
     implements Storage
 {
 
@@ -75,42 +76,46 @@ class File
         $this->_dir = $dir;
         if (!is_dir($this->_dir)) {
             if (!@mkdir($this->_dir, 0700, 1)) {
-                throw new OpenId\Exception(
-                    'Cannot access storage directory ' . $dir,
-                    OpenId\Exception::ERROR_STORAGE);
+                throw new Exception\InitializationException(
+                    'Cannot access storage directory ' . $dir);
             }
         }
-        if (($f = fopen($this->_dir.'/assoc.lock', 'w+')) === null) {
-            throw new OpenId\Exception(
-                'Cannot create a lock file in the directory ' . $dir,
-                OpenId\Exception::ERROR_STORAGE);
+
+        if (($f = @fopen($this->_dir.'/assoc.lock', 'w+')) === false) {
+            throw new Exception\LockFailedException(
+                'Cannot create a lock file in the directory ' . $dir);
         }
         fclose($f);
-        if (($f = fopen($this->_dir.'/discovery.lock', 'w+')) === null) {
-            throw new OpenId\Exception(
-                'Cannot create a lock file in the directory ' . $dir,
-                OpenId\Exception::ERROR_STORAGE);
+        if (($f = @fopen($this->_dir.'/discovery.lock', 'w+')) === false) {
+            throw new Exception\LockFailedException(
+                'Cannot create a lock file in the directory ' . $dir);
         }
         fclose($f);
-        if (($f = fopen($this->_dir.'/nonce.lock', 'w+')) === null) {
-            throw new OpenId\Exception(
-                'Cannot create a lock file in the directory ' . $dir,
-                OpenId\Exception::ERROR_STORAGE);
+        if (($f = @fopen($this->_dir.'/nonce.lock', 'w+')) === false) {
+            throw new Exception\LockFailedException(
+                'Cannot create a lock file in the directory ' . $dir);
         }
         fclose($f);
     }
 
     /**
-     * Stores information about association identified by $url/$handle
+     * Expose directory name used as destination
      *
-     * @param string $url OpenID server URL
-     * @param string $handle assiciation handle
-     * @param string $macFunc HMAC function (sha1 or sha256)
-     * @param string $secret shared secret
-     * @param long $expires expiration UNIX time
-     * @return bool
+     * @return string
      */
-    public function addAssociation($url, $handle, $macFunc, $secret, $expires)
+    public function getSavePath()
+    {
+        return $this->_dir;
+    }
+
+    /**
+     * Store information about association
+     *
+     * @param \Zend\OpenId\Association $associtation Association instance
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function addAssociation(\Zend\OpenId\Association $associtation)
     {
         $name1 = $this->_dir . '/assoc_url_' . md5($url);
         $name2 = $this->_dir . '/assoc_handle_' . md5($handle);
@@ -157,18 +162,14 @@ class File
     }
 
     /**
-     * Gets information about association identified by $url
-     * Returns true if given association found and not expired and false
-     * otherwise
+     * Get information about association identified by $url
      *
-     * @param string $url OpenID server URL
-     * @param string &$handle assiciation handle
-     * @param string &$macFunc HMAC function (sha1 or sha256)
-     * @param string &$secret shared secret
-     * @param long &$expires expiration UNIX time
-     * @return bool
+     * @param string $url OP Endpoint URL
+     * @param string $handle Association handle (if any)
+     *
+     * @return \Zend\OpenId\Association
      */
-    public function getAssociation($url, &$handle, &$macFunc, &$secret, &$expires)
+    public function getAssociation($url, $handle = null)
     {
         $name1 = $this->_dir . '/assoc_url_' . md5($url);
         $lock = @fopen($this->_dir . '/assoc.lock', 'w+');
@@ -210,65 +211,13 @@ class File
     }
 
     /**
-     * Gets information about association identified by $handle
-     * Returns true if given association found and not expired and false
-     * otherwise
+     * Remove association identified by $url
      *
-     * @param string $handle assiciation handle
-     * @param string &$url OpenID server URL
-     * @param string &$macFunc HMAC function (sha1 or sha256)
-     * @param string &$secret shared secret
-     * @param long &$expires expiration UNIX time
-     * @return bool
-     */
-    public function getAssociationByHandle($handle, &$url, &$macFunc, &$secret, &$expires)
-    {
-        $name2 = $this->_dir . '/assoc_handle_' . md5($handle);
-        $lock = @fopen($this->_dir . '/assoc.lock', 'w+');
-        if ($lock === false) {
-            return false;
-        }
-        if (!flock($lock, LOCK_EX)) {
-            fclose($lock);
-            return false;
-        }
-        try {
-            $f = @fopen($name2, 'r');
-            if ($f === false) {
-                fclose($lock);
-                return false;
-            }
-            $ret = false;
-            $data = stream_get_contents($f);
-            if (!empty($data)) {
-                list($url, $storedHandle, $macFunc, $secret, $expires) = unserialize($data);
-                if ($handle === $storedHandle && $expires > time()) {
-                    $ret = true;
-                } else {
-                    fclose($f);
-                    @unlink($name2);
-                    $name1 = $this->_dir . '/assoc_url_' . md5($url);
-                    @unlink($name1);
-                    fclose($lock);
-                    return false;
-                }
-            }
-            fclose($f);
-            fclose($lock);
-            return $ret;
-        } catch (\Exception $e) {
-            fclose($lock);
-            throw $e;
-        }
-    }
-
-    /**
-     * Deletes association identified by $url
+     * @param string $url OP Endpoint URL
      *
-     * @param string $url OpenID server URL
-     * @return bool
+     * @return \Zend\OpenId\Storage
      */
-    public function delAssociation($url)
+    public function removeAssociation($url)
     {
         $name1 = $this->_dir . '/assoc_url_' . md5($url);
         $lock = @fopen($this->_dir . '/assoc.lock', 'w+');
@@ -307,16 +256,23 @@ class File
     }
 
     /**
-     * Stores information discovered from identity $id
+     * Remove all expired associations
      *
-     * @param string $id identity
-     * @param string $realId discovered real identity URL
-     * @param string $server discovered OpenID server URL
-     * @param float $version discovered OpenID protocol version
-     * @param long $expires expiration UNIX time
-     * @return bool
+     * @return \Zend\OpenId\Storage
      */
-    public function addDiscoveryInfo($id, $realId, $server, $version, $expires)
+    public function cleanupAssociations()
+    {
+        throw new \Zend\OpenId\Exception\NotImplementedException();
+    }
+
+    /**
+     * Store information discovered for $identifier
+     *
+     * @param \Zend\OpenId\DiscoveryInfo DiscoveryInfo instance
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function addDiscoveryInfo($discoveryInfo)
     {
         $name = $this->_dir . '/discovery_' . md5($id);
         $lock = @fopen($this->_dir . '/discovery.lock', 'w+');
@@ -345,17 +301,13 @@ class File
     }
 
     /**
-     * Gets information discovered from identity $id
-     * Returns true if such information exists and false otherwise
+     * Get information discovered for $identifier
      *
-     * @param string $id identity
-     * @param string &$realId discovered real identity URL
-     * @param string &$server discovered OpenID server URL
-     * @param float &$version discovered OpenID protocol version
-     * @param long &$expires expiration UNIX time
-     * @return bool
+     * @param string $identifier Normalized Identifier used in discovery
+     *
+     * @return \Zend\OpenId\DiscoveryInfo
      */
-    public function getDiscoveryInfo($id, &$realId, &$server, &$version, &$expires)
+    public function getDiscoveryInfo($identifier)
     {
         $name = $this->_dir . '/discovery_' . md5($id);
         $lock = @fopen($this->_dir . '/discovery.lock', 'w+');
@@ -395,12 +347,13 @@ class File
     }
 
     /**
-     * Removes cached information discovered from identity $id
+     * Remove cached information discovered for $identifier
      *
-     * @param string $id identity
-     * @return bool
+     * @param string $identifier Normalized Identifier used in discovery
+     *
+     * @return \Zend\OpenId\Storage
      */
-    public function delDiscoveryInfo($id)
+    public function removeDiscoveryInfo($identifier)
     {
         $name = $this->_dir . '/discovery_' . md5($id);
         $lock = @fopen($this->_dir . '/discovery.lock', 'w+');
@@ -422,13 +375,24 @@ class File
     }
 
     /**
-     * The function checks the uniqueness of openid.response_nonce
+     * Remove expired discovery data from the cache
      *
-     * @param string $provider openid.openid_op_endpoint field from authentication response
-     * @param  string $nonce openid.response_nonce field from authentication response
-     * @return bool
+     * @return \Zend\OpenId\Storage
      */
-    public function isUniqueNonce($provider, $nonce)
+    public function cleanupDiscoveryInfo()
+    {
+        throw new \Zend\OpenId\Exception\NotImplementedException();
+    }
+
+    /**
+     * Associate OP Endpoint URL with nonce value to prevent replay attacks
+     *
+     * @param string $url OP Endpoint URL
+     * @param \Zend\OpenId\Nonce $nonce Response nonce returned by OP
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function addNonce($nonce)
     {
         $name = $this->_dir . '/nonce_' . md5($provider.';'.$nonce);
         $lock = @fopen($this->_dir . '/nonce.lock', 'w+');
@@ -456,11 +420,24 @@ class File
     }
 
     /**
-     * Removes data from the uniqueness database that is older then given date
+     * Remove associated nonce
      *
-     * @param mixed $date date of expired data
+     * @param string $url OP Endpoint URL
+     *
+     * @return \Zend\OpenId\Storage
      */
-    public function purgeNonces($date=null)
+    public function removeNonce($url)
+    {
+        throw new \Zend\OpenId\Exception\NotImplementedException();
+    }
+
+    /**
+     * Cleanup all exprired nonce data
+     *
+     * @param int $timestamp
+     * @return \Zend\OpenId\Storage
+     */
+    public function cleanupNonces()
     {
         $lock = @fopen($this->_dir . '/nonce.lock', 'w+');
         if ($lock !== false) {
