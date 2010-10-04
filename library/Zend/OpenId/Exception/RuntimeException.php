@@ -28,8 +28,8 @@ namespace Zend\OpenId\Exception;
  * @category   Zend
  * @package    Zend_OpenId
  * @copyright  Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
- * @uses       \Zend\OpenId\Exception
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
+ * @uses       \Zend\OpenId\Exception
  */
 class RuntimeException
     extends \RuntimeException
