@@ -32,4 +32,109 @@ namespace Zend\OpenId;
  */
 interface Storage
 {
+    /**
+     * Store information about association
+     *
+     * @param \Zend\OpenId\Association $associtation Association instance
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function addAssociation(\Zend\OpenId\Association $associtation);
+
+    /**
+     * Get information about association identified by $url
+     *
+     * @param string $url OP Endpoint URL
+     * @param string $handle Association handle (if any)
+     *
+     * @return \Zend\OpenId\Association
+     */
+    public function getAssociation($url, $handle = null);
+
+    /**
+     * Remove association identified by $url
+     *
+     * @param string $url OP Endpoint URL
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function removeAssociation($url);
+
+    /**
+     * Remove all expired associations
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function cleanupAssociations();
+
+    /**
+     * Store information discovered for $identifier
+     *
+     * @param \Zend\OpenId\DiscoveryInfo DiscoveryInfo instance
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function addDiscoveryInfo($discoveryInfo);
+
+    /**
+     * Get information discovered for $identifier
+     *
+     * @param string $identifier Normalized Identifier used in discovery
+     *
+     * @return \Zend\OpenId\DiscoveryInfo
+     */
+    public function getDiscoveryInfo($identifier);
+
+    /**
+     * Remove cached information discovered for $identifier
+     *
+     * @param string $identifier Normalized Identifier used in discovery
+     *
+     * @return \Zend\OpenId\Storage
+    */
+    public function removeDiscoveryInfo($identifier);
+
+    /**
+     * Remove expired discovery data from the cache
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function cleanupDiscoveryInfo();
+
+    /**
+     * Associate OP Endpoint URL with nonce value to prevent replay attacks
+     *
+     * @param string $url OP Endpoint URL
+     * @param \Zend\OpenId\Nonce $nonce Response nonce returned by OP
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function addNonce($nonce);
+
+    /**
+     * Remove associated nonce
+     *
+     * @param string $url OP Endpoint URL
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function removeNonce($url);
+
+    /**
+     * Cleanup all exprired nonce data
+     *
+     * @param int $timestamp
+     * @return \Zend\OpenId\Storage
+     */
+    public function cleanupNonces();
+
+    /**
+     * Reset the storage to its initial state
+     *
+     * Internally cleanupAssociations(), cleanupNonces(), and 
+     * cleanupDiscoveryInfo() are called
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function cleanup();
 }
