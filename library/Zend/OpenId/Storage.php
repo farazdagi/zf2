@@ -91,7 +91,7 @@ interface Storage
      * @param string $identifier Normalized Identifier used in discovery
      *
      * @return \Zend\OpenId\Storage
-    */
+     */
     public function removeDiscoveryInfo($identifier);
 
     /**

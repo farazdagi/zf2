@@ -26,7 +26,8 @@
 namespace ZendTest\OpenId\Storage;
 
 use Zend\OpenId\OpenId,
-    Zend\OpenId\Storage;
+    Zend\OpenId\Storage,
+    Zend\OpenId\Storage\Exception;
 
 /**
  * @see Storage\File
@@ -100,7 +101,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
     /**
      * testing __construct
-     *
+     * @group current
      */
     public function testConstruct()
     {
@@ -111,6 +112,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue( is_dir($dir) );
 
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $this->markTestSkipped();
             return;
         }
 
@@ -119,15 +121,139 @@ class FileTest extends \PHPUnit_Framework_TestCase
         try {
             $storage = new Storage\File($dir2);
             $ex = null;
-        } catch (\Exception $e) {
+        } catch (Exception\InitializationException $e) {
             $ex = $e;
         }
-        $this->assertTrue( $ex instanceof \Zend\OpenId\Exception );
-        $this->assertSame( \Zend\OpenId\Exception::ERROR_STORAGE, $ex->getCode() );
+        // check marker exception
+        $this->assertInstanceOf('\Zend\OpenId\Exception', $ex);
+        $this->assertInstanceOf('\Zend\OpenId\Storage\Exception', $ex);
         $this->assertContains( 'Cannot access storage directory', $ex->getMessage() );
         chmod($dir, 0777);
         $this->assertFalse( is_dir($dir2) );
         self::_rmDir($dir);
+    }
+
+    /**
+     * @group current
+     */
+    public function testConstructWithNoDirSpecified()
+    {
+        $storage = new Storage\File();
+
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $this->markTestSkipped();
+            return;
+        }
+
+        $dir = $storage->getSavePath();
+
+        chmod($dir, 0400);
+        $dir2 = $dir . '/test';
+        try {
+            $storage = new Storage\File($dir2);
+            $ex = null;
+        } catch (Exception\InitializationException $e) {
+            $ex = $e;
+        }
+        // check marker exception
+        $this->assertInstanceOf('\Zend\OpenId\Exception', $ex);
+        $this->assertInstanceOf('\Zend\OpenId\Storage\Exception', $ex);
+        $this->assertContains( 'Cannot access storage directory', $ex->getMessage() );
+        chmod($dir, 0777);
+        $this->assertFalse( is_dir($dir2) );
+        self::_rmDir($dir);
+    }
+
+    /**
+     * @group current
+     */
+    public function testConstructAssocLockException()
+    {
+        $tmp = $this->_tmpDir;
+        $dir = $tmp . '/openid_consumer';
+        $storage = new Storage\File($dir);
+
+        $this->assertTrue( is_dir($dir) );
+
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $this->markTestSkipped();
+            return;
+        }
+
+        chmod($dir . '/assoc.lock', 000);
+        try {
+            $storage = new Storage\File($dir);
+            $ex = null;
+        } catch (Exception $e) {
+            $ex = $e;
+        }
+        $this->assertInstanceOf('\Zend\OpenId\Exception', $ex);
+        $this->assertInstanceOf('\Zend\OpenId\Storage\Exception', $ex);
+        $this->assertInstanceOf('\Zend\OpenId\Storage\Exception\LockFailedException', $ex);
+        chmod($dir . '/assoc.lock', 777);
+    }
+
+    /**
+     * @group current
+     */
+    public function testConstructDiscoveryLockException()
+    {
+        $tmp = $this->_tmpDir;
+        $dir = $tmp . '/openid_consumer';
+        $storage = new Storage\File($dir);
+
+        $this->assertTrue( is_dir($dir) );
+
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $this->markTestSkipped();
+            return;
+        }
+
+        chmod($dir . '/discovery.lock', 000);
+        try {
+            $storage = new Storage\File($dir);
+            $ex = null;
+        } catch (Exception $e) {
+            $ex = $e;
+        }
+        $this->assertInstanceOf('\Zend\OpenId\Exception', $ex);
+        $this->assertInstanceOf('\Zend\OpenId\Storage\Exception', $ex);
+        $this->assertInstanceOf('\Zend\OpenId\Storage\Exception\LockFailedException', $ex);
+        chmod($dir . '/discovery.lock', 777);
+    }
+
+    /**
+     * @group current
+     */
+    public function testConstructNonceLockException()
+    {
+        $tmp = $this->_tmpDir;
+        $dir = $tmp . '/openid_consumer';
+        $storage = new Storage\File($dir);
+
+        $this->assertTrue( is_dir($dir) );
+
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $this->markTestSkipped();
+            return;
+        }
+
+        chmod($dir . '/nonce.lock', 000);
+        try {
+            $storage = new Storage\File($dir);
+            $ex = null;
+        } catch (Exception $e) {
+            $ex = $e;
+        }
+        $this->assertInstanceOf('\Zend\OpenId\Exception', $ex);
+        $this->assertInstanceOf('\Zend\OpenId\Storage\Exception', $ex);
+        $this->assertInstanceOf('\Zend\OpenId\Storage\Exception\LockFailedException', $ex);
+        chmod($dir . '/nonce.lock', 777);
+    }
+
+    public function testSetAssociation()
+    {
+        $this->markTestIncomplete();
     }
 
     /**
