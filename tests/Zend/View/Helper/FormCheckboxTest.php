@@ -252,7 +252,7 @@ class FormCheckboxTest extends \PHPUnit_Framework_TestCase
 
     public function testCanRendersAsXHtml()
     {
-        $this->view->doctype('XHTML1_STRICT');
+        $this->view->broker('doctype')->direct('XHTML1_STRICT');
         $test = $this->helper->direct('foo', 'bar');
         $this->assertContains(' />', $test);
     }
@@ -287,9 +287,3 @@ class FormCheckboxTest extends \PHPUnit_Framework_TestCase
        $this->assertNotContains('checked="checked"', $test);
    }
 }
-
-// Call Zend_View_Helper_FormCheckboxTest::main() if this source file is executed directly.
-if (PHPUnit_MAIN_METHOD == "Zend_View_Helper_FormCheckboxTest::main") {
-    \Zend_View_Helper_FormCheckboxTest::main();
-}
-

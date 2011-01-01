@@ -116,8 +116,8 @@ class EmailAddress extends AbstractValidator
      * Instantiates hostname validator for local use
      *
      * The following option keys are supported:
-     * 'hostname' => A hostname validator, see Zend_Validate_Hostname
-     * 'allow'    => Options for the hostname validator, see Zend_Validate_Hostname::ALLOW_*
+     * 'hostname' => A hostname validator, see Zend\Validator\Hostname
+     * 'allow'    => Options for the hostname validator, see Zend\Validator\Hostname::ALLOW_*
      * 'mx'       => If MX check should be enabled, boolean
      * 'deep'     => If a deep MX check should be done, boolean
      *
@@ -202,17 +202,17 @@ class EmailAddress extends AbstractValidator
      */
     public function setMessage($messageString, $messageKey = null)
     {
-        $messageKeys = $messageKey;
         if ($messageKey === null) {
-            $keys = array_keys($this->_messageTemplates);
-            $messageKeys = current($keys);
+            $this->_options['hostname']->setMessage($messageString);
+            parent::setMessage($messageString);
+            return $this;
         }
 
-        if (!isset($this->_messageTemplates[$messageKeys])) {
+        if (!isset($this->_messageTemplates[$messageKey])) {
             $this->_options['hostname']->setMessage($messageString, $messageKey);
         }
 
-        $this->_messageTemplates[$messageKeys] = $messageString;
+        $this->_messageTemplates[$messageKey] = $messageString;
         return $this;
     }
 
@@ -275,7 +275,7 @@ class EmailAddress extends AbstractValidator
     public function setValidateMx($mx)
     {
         if ((bool) $mx && !$this->validateMxSupported()) {
-            throw new Exception('MX checking not available on this system');
+            throw new Exception\InvalidArgumentException('MX checking not available on this system');
         }
 
         $this->_options['mx'] = (bool) $mx;
