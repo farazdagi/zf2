@@ -22,12 +22,12 @@
 /**
  * @namespace
  */
-namespace Zend\OpenId\Message;
+namespace Zend\OpenId\Message\Container;
 use Zend\OpenId;
 
 /**
- * Message encoding/format defined in Section 4 of the 
- * {@link http://openid.net/specs/openid-authentication-2_0.html 
+ * Message container - implements message encoding/format defined in Section 4 
+ * of the {@link http://openid.net/specs/openid-authentication-2_0.html 
  * OpenID 2.0 Specification}. In addition to formats provided by specs, 
  * additional format (TYPE_ARRAY) is added to facilitate development.
  *
@@ -37,24 +37,7 @@ use Zend\OpenId;
  * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-interface Encoding
-{
-    const TYPE_ARRAY = 1;
-    const TYPE_KEYVALUE = 2;
-    const TYPE_HTTP = 4;
-
-    /**
-     * Encode array of items into string acc. to concrete encoding algorithm
-     *
-     * @return string|array String for actual algorithms (KeyValue and Http) 
-     * and array for debugging algorithm (AsArray)
-     */
-    public function encode($items);
-
-    /**
-     * Parse incoming data into array
-     *
-     * @return array
-     */
-    public function decode($data);
-}
+class Standard
+    extends OpenId\Message\Container
+    implements OpenId\Message
+{}
