@@ -14,6 +14,7 @@
  *
  * @category   Zend
  * @package    Zend_OpenId
+ * @subpackage Zend_OpenId_Message
  * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
@@ -21,14 +22,36 @@
 /**
  * @namespace
  */
-namespace Zend\OpenId;
-use Zend\OpenId\Message;
+namespace Zend\OpenId\Message;
+use Zend\OpenId;
 
 /**
- * Message container object.
+ * Message container - implements message encoding/format defined in Section 4 
+ * of the {@link http://openid.net/specs/openid-authentication-2_0.html 
+ * OpenID 2.0 Specification}. In addition to formats provided by specs, 
+ * additional format (TYPE_ARRAY) is added to facilitate development.
+ *
+ * @category   Zend
+ * @package    Zend_OpenId
+ * @subpackage Zend_OpenId_Message
+ * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+ * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-interface Message
+abstract class Container
+    implements OpenId\Message
 {
+    /**
+     * List of items wrapped inside message container
+     * @var array
+     */
+    private $items = array();
+
+    /**
+     * Encoding format
+     * @var \Zend\OpenId\Message\Encoding
+     */
+    private $encoding;
+
     /**
      * Make sure that class is ready for Dependency Injection
      *
@@ -36,7 +59,12 @@ interface Message
      *
      * @return void
      */
-    public function __construct($encoding = null);
+    public function __construct($encoding = null)
+    {
+        if (null !== $encoding) {
+            $this->setEncoding($encoding);
+        }
+    }
 
     /**
      * Set single field in message
@@ -46,16 +74,27 @@ interface Message
      *
      * @return \Zend\OpenId\Message
      */
-    public function setItem($name, $value);
+    public function setItem($name, $value)
+    {
+        $this->items[$name] = $value;
+        return $this;
+    }
 
     /**
      * Get single message field
      *
      * @param string $name Field name
      *
-     * @return string
+     * @return null|string
      */
-    public function getItem($name);
+    public function getItem($name)
+    {
+        if (isset($this->items[$name])) {
+            return $this->items[$name];
+        }
+
+        return null;
+    }
 
     /**
      * Clear the field from the messge
@@ -64,7 +103,11 @@ interface Message
      *
      * @return \Zend\OpenId\Message
      */
-    public function removeItem($name);
+    public function removeItem($name)
+    {
+        unset($this->items[$name]);
+        return $this;
+    }
 
     /**
      * Reset message and populate it with provided data.
@@ -78,12 +121,25 @@ interface Message
      *
      * @return \Zend\OpenId\Message
      */
-    public function set($data, $encoding = null);
+    public function set($data, $encoding = null)
+    {
+        if (null !== $encoding) {
+            $this->setEncoding($encoding);
+        }
+
+        $this->items = $this->getEncoding()
+                            ->decode($data);
+
+        return $this;
+    }
 
     /**
      * Alias for self::set()
      */
-    public function setMessage($data, $encoding = null);
+    public function setMessage($data, $encoding = null)
+    {
+        return $this->set($data, $encoding);
+    }
 
     /**
      * Generate and return message using specified encoding.
@@ -96,12 +152,23 @@ interface Message
      *
      * @return string 
      */
-    public function get($encoding = Message\Encoding::TYPE_ARRAY);
+    public function get($encoding = null)
+    {
+        if (null !== $encoding) {
+            $this->setEncoding($encoding);
+        }
+
+        return $this->getEncoding()
+                    ->encode($this->items);
+    }
 
     /**
      * Alias for self::get()
      */
-    public function getMessage($encoding = Message\Encoding::TYPE_ARRAY);
+    public function getMessage($encoding = null)
+    {
+        return $this->get($encoding);
+    }
 
     /**
      * Set current encoding format.
@@ -114,13 +181,29 @@ interface Message
      *
      * @return \Zend\OpenId\Message
      */
-    public function setEncoding($encoding = Message\Encoding::TYPE_ARRAY);
+    public function setEncoding($encoding = Message\Encoding::TYPE_ARRAY)
+    {
+        if (!($encoding instanceof \Zend\OpenId\Message\Encoding)) {
+            $encoding = Encoding\Factory::create($encoding);
+        }
+        $this->encoding = $encoding;
+
+        return $this;
+    }
 
     /**
      * Get current encoding format
      *
      * @return \Zend\OpenId\Message\Encoding
      */
-    public function getEncoding();
+    public function getEncoding()
+    {
+        if (null === $this->encoding) {
+            $this->encoding = new Encoding\AsArray();
+        }
+
+        return $this->encoding;
+    }
+
 
 }
