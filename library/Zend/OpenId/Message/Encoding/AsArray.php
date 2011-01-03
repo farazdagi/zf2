@@ -27,9 +27,7 @@ use Zend\OpenId,
     Zend\OpenId\Message;
 
 /**
- * HTTP message encoding strategy as outlined in section 4.1.2 of
- * {@link http://openid.net/specs/openid-authentication-2_0.html 
- * OpenID 2.0 Specification}. 
+ * Array message encoding strategy. This is an auxilary format to ease development.
  *
  * @category   Zend
  * @package    Zend_OpenId
@@ -37,22 +35,17 @@ use Zend\OpenId,
  * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class Http
+class AsArray
     implements OpenId\Message\Encoding
 {
     /**
      * Encode array of items into string acc. to concrete encoding algorithm
      *
-     * @return string
+     * @return array
      */
     public function encode($items)
     {
-        $pairs = array();
-        foreach ($items as $key => $value) {
-            $pairs[] = sprintf("%s=%s", urlencode($key), urlencode($value)); 
-        }
-
-        return implode('&', $pairs);
+        return $items;
     }
 
     /**
@@ -62,14 +55,7 @@ class Http
      */
     public function decode($data)
     {
-        $items = array();
-        $pairs = explode('&', $data);
-        foreach ($pairs as $pair) {
-            if (trim($pair) !== '' && strpos($pair, '=') !== false) {
-                list($key, $value) = explode('=', $pair, 2);
-                $items[urldecode($key)] = urldecode($value);
-            }
-        }
-        return $items;
+        return $data; // since nothing has been done in encoding stage
+                      // nothing is donw on decode
     }
 }
