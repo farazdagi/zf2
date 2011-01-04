@@ -43,11 +43,35 @@ class EncodingTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($id->get());
         $this->assertEquals($id->set('a')->get(), 'a');
 
+        $id = new Identifier\UserSupplied('example://a/b/c#fragment');
+        $this->assertSame($id->get(), 'example://a/b/c#fragment');
+
     }
 
     public function testClaimedId()
     {
-        $this->markTestIncomplete();
+        $id = new Identifier\Claimed(new Identifier\UserSupplied('example://a/b/c#fragment'));
+        $this->assertSame($id->get(), 'example://a/b/c');
+
+        $id = new Identifier\Claimed('example://a/b/c#fragment');
+        $this->assertSame($id->get(), 'example://a/b/c'); // by default Claimed is treated as for authorization
+
+        $url = 'eXAMPLE://A/./b/../b/%63/%bbfoo%Bd';
+        $id = new Identifier\Claimed($url);
+        $this->assertSame($id->getRaw() , $url);
+        $this->assertSame($id->get(), 'example://a/b/c/%BBfoo%BD');
+
+        $xri = '=example';
+        $id = new Identifier\Claimed($xri);
+        $this->assertSame($id->get(), $xri);
+
+        $xri = 'xri://=example';
+        $id = new Identifier\Claimed($xri);
+        $this->assertSame($id->get(), '=example');
+
+        $xri = 'xri://@example*part';
+        $id = new Identifier\Claimed($xri);
+        $this->assertSame($id->get(), '@example*part');
     }
 
     public function testClaimedForAuthorizationRequestId()
@@ -67,6 +91,16 @@ class EncodingTest extends \PHPUnit_Framework_TestCase
     public function testNormalizeUrl()
     {
         $id = new Identifier\Claimed();
+
+        $url = ':';
+        $this->assertNull($id->set($url)->get());
+
+        $url = 'http://@@'; // to test url decomposing regexp fail
+        $this->assertNull($id->set($url)->get());
+
+        $url = 'example://a/b/c/';
+        $this->assertSame($id->set($url)->get(), $url);
+
         $url = 'example://a/b/c/%7Bfoo%7D';
         $this->assertSame($id->set($url)->get(), $url);
 
