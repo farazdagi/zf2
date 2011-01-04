@@ -76,12 +76,55 @@ class EncodingTest extends \PHPUnit_Framework_TestCase
 
     public function testClaimedForAuthorizationRequestId()
     {
-        $this->markTestIncomplete();
+        $id = new Identifier\Claimed\ForAuthorizationRequest(new Identifier\UserSupplied('example://a/b/c#fragment'));
+        $this->assertSame($id->get(), 'example://a/b/c');
+
+        $id = new Identifier\Claimed\ForAuthorizationRequest('example://a/b/c#fragment');
+        $this->assertSame($id->get(), 'example://a/b/c'); // by default Claimed is treated as for authorization
+
+        $url = 'eXAMPLE://A/./b/../b/%63/%bbfoo%Bd';
+        $id = new Identifier\Claimed\ForAuthorizationRequest($url);
+        $this->assertSame($id->getRaw() , $url);
+        $this->assertSame($id->get(), 'example://a/b/c/%BBfoo%BD');
+
+        $xri = '=example';
+        $id = new Identifier\Claimed\ForAuthorizationRequest($xri);
+        $this->assertSame($id->get(), $xri);
+
+        $xri = 'xri://=example';
+        $id = new Identifier\Claimed\ForAuthorizationRequest($xri);
+        $this->assertSame($id->get(), '=example');
+
+        $xri = 'xri://@example*part';
+        $id = new Identifier\Claimed\ForAuthorizationRequest($xri);
+        $this->assertSame($id->get(), '@example*part');
+
     }
 
     public function testClaimedForPositiveAssertionId()
     {
-        $this->markTestIncomplete();
+        $id = new Identifier\Claimed\ForPositiveAssertion(new Identifier\UserSupplied('example://a/b/c#fragment'));
+        $this->assertSame($id->get(), 'example://a/b/c#fragment');
+
+        $id = new Identifier\Claimed\ForPositiveAssertion('example://a/b/c#fragment');
+        $this->assertSame($id->get(), 'example://a/b/c#fragment'); // for positive assertion fragment is preserved
+
+        $url = 'eXAMPLE://A/./b/../b/%63/%bbfoo%Bd';
+        $id = new Identifier\Claimed\ForPositiveAssertion($url);
+        $this->assertSame($id->getRaw() , $url);
+        $this->assertSame($id->get(), 'example://a/b/c/%BBfoo%BD');
+
+        $xri = '=example';
+        $id = new Identifier\Claimed\ForPositiveAssertion($xri);
+        $this->assertSame($id->get(), $xri);
+
+        $xri = 'xri://=example';
+        $id = new Identifier\Claimed\ForPositiveAssertion($xri);
+        $this->assertSame($id->get(), '=example');
+
+        $xri = 'xri://@example*part';
+        $id = new Identifier\Claimed\ForPositiveAssertion($xri);
+        $this->assertSame($id->get(), '@example*part');
     }
 
     /**
