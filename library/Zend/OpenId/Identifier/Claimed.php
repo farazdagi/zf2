@@ -55,12 +55,15 @@ class Claimed
     /**
      * Allow to pass decorated Identifier directly into constructor
      *
-     * @param \Zend\OpenId\Identifier $id Decorated Identifier
+     * @param string|\Zend\OpenId\Identifier $id Decorated Identifier
      *
      * @return void
      */
-    public function construct(\Zend\OpenId\Identifier $id)
+    public function __construct($id = null)
     {
+        if (!($id instanceof \Zend\OpenId\Identifier)) {
+            $id = new UserSupplied($id);
+        }
         $this->set($id->get());
     }
 
