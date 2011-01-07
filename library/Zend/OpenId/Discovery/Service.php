@@ -44,7 +44,23 @@ interface Service
      *
      * @param \Zend\OpenId\Identifier Identifier to perform discovery on
      *
-     * @return \Zend\OpenId\Discovery\Result
+     * @return \Zend\OpenId\Discovery\Information
      */
     public function discover(\Zend\OpenId\Identifier $id);
+
+    /**
+     * Discovered info is cached using various types of storages. Concrete
+     * storage type can be injected into any Discovery\Service
+     *
+     * @param \Zend\OpenId\Storage $storage Storage adapter to use
+     * @return \Zend\OpenId\Discovery\Service
+     */
+    public function setStorage(\Zend\OpenId\Storage $storage);
+
+    /**
+     * Get storage
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function getStorage();
 }
