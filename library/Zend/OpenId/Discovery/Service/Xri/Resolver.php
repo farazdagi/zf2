@@ -22,13 +22,17 @@
 /**
  * @namespace
  */
-namespace Zend\OpenId\Discovery\Yadis;
+namespace Zend\OpenId\Discovery\Service\Xri;
 use Zend\OpenId;
 
 /**
- * Yadis protocol implementation. Given a YadisID, resolver produces
- * Yadis Resource Descriptor (which is XRDS document), which is parsed into 
- * \Zend\OpenId\Discovery\Result object.
+ * Discovery on XRI Identifier
+ *
+ * If the identifier is an XRI, [XRI_Resolution_2.0]  will yield an XRDS document 
+ * that contains the necessary information. It should also be noted that 
+ * Relying Parties can take advantage of XRI Proxy Resolvers, such as the one 
+ * provided by XDI.org at http://www.xri.net. This will remove the need 
+ * for the RPs to perform XRI Resolution locally. 
  *
  * @category   Zend
  * @package    Zend_OpenId
@@ -37,6 +41,7 @@ use Zend\OpenId;
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 class Resolver
+    extends OpenId\Discovery\Service\Resolver
     implements OpenId\Discovery\Service
 {
     /**
