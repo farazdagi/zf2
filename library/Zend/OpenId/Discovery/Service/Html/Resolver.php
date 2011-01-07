@@ -22,7 +22,7 @@
 /**
  * @namespace
  */
-namespace Zend\OpenId\Discovery\Html;
+namespace Zend\OpenId\Discovery\Service\Html;
 use Zend\OpenId;
 
 /**
@@ -48,6 +48,7 @@ use Zend\OpenId;
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 class Resolver
+    extends OpenId\Discovery\Service\Resolver
     implements OpenId\Discovery\Service,
                OpenId\Discovery\Transport
 {
