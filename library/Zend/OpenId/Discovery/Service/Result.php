@@ -91,7 +91,7 @@ class Result
      * @param string $url OP Endpoint URL
      * @return \Zend\OpenId\Discovery\Information
      */
-    public function setEndpointUrl($url)
+    public function setEndpointUrl($url = null)
     {
         $this->endpointUrl = $url;
         return $this;
@@ -113,7 +113,7 @@ class Result
      * @param string $version Protocol version
      * @return \Zend\OpenId\Discovery\Information
      */
-    public function setProtocolVersion($version)
+    public function setProtocolVersion($version = null)
     {
         $this->protocolVersion = $version;
         return $this;
@@ -138,7 +138,7 @@ class Result
      * @param \Zend\OpenId\Identifier $id Claimed Identifier
      * @return \Zend\OpenId\Discovery\Information
      */
-    public function setClaimedIdentifier(\Zend\OpenId\Identifier $id)
+    public function setClaimedIdentifier(\Zend\OpenId\Identifier $id = null)
     {
         $this->claimedIdentifier = $id;
         return $this;
@@ -163,7 +163,7 @@ class Result
      * @param \Zend\OpenId\Identifier $id OP-Local Identifier
      * @return \Zend\OpenId\Discovery\Information
      */
-    public function setLocalIdentifier(\Zend\OpenId\Identifier $id)
+    public function setLocalIdentifier(\Zend\OpenId\Identifier $id = null)
     {
         $this->localIdentifier = $id;
         return $this;
