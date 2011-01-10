@@ -47,6 +47,15 @@ interface Information
     extends \Serializable
 {
     /**
+     * Discoverable service types
+     */
+    const OPENID_10 = "http://openid.net/signon/1.0";
+    const OPENID_11 = "http://openid.net/signon/1.1";
+    const OPENID_20 = "http://specs.openid.net/auth/2.0/signon";
+    const OPENID_20_OP = "http://specs.openid.net/auth/2.0/server";
+    const OPENID_20_RP = "http://specs.openid.net/auth/2.0/return_to";
+
+    /**
      * Set OP Endpoint URL
      *
      * @param string $url OP Endpoint URL
@@ -111,4 +120,19 @@ interface Information
      * @return \Zend\OpenId\Identifier
      */
     public function getLocalIdentifier();
+
+    /**
+     * For reference: Identifier on which discovery was performed is preserved
+     *
+     * @param \Zend\OpenId\Identifier $id Original Identifier
+     * @return \Zend\OpenId\Discovery\Information
+     */
+    public function setSuppliedIdentifier(\Zend\OpenId\Identifier $id = null);
+
+    /**
+     * Get original identifier used for discovery
+     *
+     * @return \Zend\OpenId\Identifier
+     */
+    public function getSuppliedIdentifier();
 }
