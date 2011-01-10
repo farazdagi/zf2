@@ -83,10 +83,20 @@ class Expiration
         return $this->timestamp < time();
     } 
 
+    /**
+     * Serialize all relevant data
+     *
+     * @return string
+     */
     public function serialize() {
         return serialize($this->timestamp);
     }
 
+    /**
+     * Unserialize previously serialized object's data
+     *
+     * @return void
+     */
     public function unserialize($data) {
         $this->timestamp = unserialize($data);
     }
