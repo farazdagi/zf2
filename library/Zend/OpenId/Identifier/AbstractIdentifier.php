@@ -66,4 +66,15 @@ class AbstractIdentifier
         $this->value = $id;
         return $this;
     }
+
+    /**
+     * Although not required by interface (and as such is not guaranteed by 
+     * object type), this method helps with debugging Identifiers.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->get();
+    }
 }
