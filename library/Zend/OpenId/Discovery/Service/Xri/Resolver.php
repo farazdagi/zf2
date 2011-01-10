@@ -49,7 +49,7 @@ class Resolver
      *
      * @param \Zend\OpenId\Identifier Identifier to perform discovery on
      *
-     * @return \Zend\OpenId\Discovery\Result
+     * @return \Zend\OpenId\Discovery\Information
      */
     public function discover(\Zend\OpenId\Identifier $id)
     {}
