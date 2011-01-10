@@ -61,7 +61,7 @@ interface Information
      * @param string $url OP Endpoint URL
      * @return \Zend\OpenId\Discovery\Information
      */
-    public function setEndpointUrl($url);
+    public function setEndpointUrl($url = null);
 
     /**
      * Get OP Endpoint URL
@@ -76,7 +76,7 @@ interface Information
      * @param string $version Protocol version
      * @return \Zend\OpenId\Discovery\Information
      */
-    public function setProtocolVersion($version);
+    public function setProtocolVersion($version = null);
 
     /**
      * Get protocol version
@@ -94,7 +94,7 @@ interface Information
      * @param \Zend\OpenId\Identifier $id Claimed Identifier
      * @return \Zend\OpenId\Discovery\Information
      */
-    public function setClaimedIdentifier(\Zend\OpenId\Identifier $id);
+    public function setClaimedIdentifier(\Zend\OpenId\Identifier $id = null);
 
     /**
      * Get Claimed Identifier (if applicable)
@@ -112,7 +112,7 @@ interface Information
      * @param \Zend\OpenId\Identifier $id OP-Local Identifier
      * @return \Zend\OpenId\Discovery\Information
      */
-    public function setLocalIdentifier(\Zend\OpenId\Identifier $id);
+    public function setLocalIdentifier(\Zend\OpenId\Identifier $id = null);
 
     /**
      * Get OP-Local Identifier (if applicable)
