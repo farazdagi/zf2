@@ -49,4 +49,13 @@ interface Identifier
      * @return \Zend\OpenId\Identifier
      */
     public function set($id);
+
+    /**
+     * Check if passed Identifier is equal to contained
+     *
+     * @param \Zend\OpenId\Identifier $id Identifier to compare to
+     *
+     * @return boolean
+     */
+    public function equals(\Zend\OpenId\Identifier $id);
 }
