@@ -26,6 +26,8 @@
 namespace ZendTest\OpenId\Storage;
 
 use Zend\OpenId\OpenId,
+    Zend\OpenId\Identifier,
+    Zend\OpenId\Discovery,
     Zend\OpenId\Storage,
     Zend\OpenId\Storage\Exception;
 
@@ -267,14 +269,14 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
         $expiresIn = time() + 600;
         $storage = new Storage\File($tmp);
-        $storage->delAssociation(self::URL);
+        $storage->removeAssociation(self::URL);
         $this->assertTrue( $storage->addAssociation(self::URL, self::HANDLE, self::MAC_FUNC, self::SECRET, $expiresIn) );
         $this->assertTrue( $storage->getAssociation(self::URL, $handle, $macFunc, $secret, $expires) );
         $this->assertSame( self::HANDLE, $handle );
         $this->assertSame( self::MAC_FUNC, $macFunc );
         $this->assertSame( self::SECRET, $secret );
         $this->assertSame( $expiresIn, $expires );
-        $this->assertTrue( $storage->delAssociation(self::URL) );
+        $this->assertTrue( $storage->removeAssociation(self::URL) );
         $this->assertFalse( $storage->getAssociation(self::URL, $handle, $macFunc, $secret, $expires) );
 
         $storage = new Storage\File($dir);
@@ -300,14 +302,14 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
         $expiresIn = time() + 600;
         $storage = new Storage\File($tmp);
-        $storage->delAssociation(self::URL);
+        $storage->removeAssociation(self::URL);
         $this->assertTrue( $storage->addAssociation(self::URL, self::HANDLE, self::MAC_FUNC, self::SECRET, $expiresIn) );
         $this->assertTrue( $storage->getAssociationByHandle(self::HANDLE, $url, $macFunc, $secret, $expires) );
         $this->assertSame( self::URL, $url );
         $this->assertSame( self::MAC_FUNC, $macFunc );
         $this->assertSame( self::SECRET, $secret );
         $this->assertSame( $expiresIn, $expires );
-        $this->assertTrue( $storage->delAssociation(self::URL) );
+        $this->assertTrue( $storage->removeAssociation(self::URL) );
         $this->assertFalse( $storage->getAssociationByHandle(self::HANDLE, $url, $macFunc, $secret, $expires) );
     }
 
@@ -322,7 +324,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
         $expiresIn = time() + 1;
         $storage = new Storage\File($tmp);
-        $storage->delAssociation(self::URL);
+        $storage->removeAssociation(self::URL);
         $this->assertTrue( $storage->addAssociation(self::URL, self::HANDLE, self::MAC_FUNC, self::SECRET, $expiresIn) );
         sleep(2);
         $this->assertFalse( $storage->getAssociation(self::URL, $handle, $macFunc, $secret, $expires) );
@@ -339,7 +341,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
         $expiresIn = time() + 1;
         $storage = new Storage\File($tmp);
-        $storage->delAssociation(self::URL);
+        $storage->removeAssociation(self::URL);
         $this->assertTrue( $storage->addAssociation(self::URL, self::HANDLE, self::MAC_FUNC, self::SECRET, $expiresIn) );
         sleep(2);
         $this->assertFalse( $storage->getAssociationByHandle(self::HANDLE, $url, $macFunc, $secret, $expires) );
@@ -347,24 +349,44 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
     /**
      * testing getDiscoveryInfo
-     *
+     * @group discoveryInfo
      */
     public function testGetDiscoveryInfo()
     {
         $tmp = $this->_tmpDir;
         $dir = $tmp . '/openid_consumer';
 
-        $expiresIn = time() + 600;
+        $expiresIn = new Storage\Expiration(time() + 600);
         $storage = new Storage\File($tmp);
-        $storage->delDiscoveryInfo(self::ID);
-        $this->assertTrue( $storage->addDiscoveryInfo(self::ID, self::REAL_ID, self::SERVER, self::VERSION, $expiresIn) );
-        $this->assertTrue( $storage->getDiscoveryInfo(self::ID, $realId, $server, $version, $expires) );
-        $this->assertSame( self::REAL_ID, $realId );
-        $this->assertSame( self::SERVER, $server );
-        $this->assertSame( self::VERSION, $version );
-        $this->assertSame( $expiresIn, $expires );
-        $this->assertTrue( $storage->delDiscoveryInfo(self::ID) );
-        $this->assertFalse( $storage->getDiscoveryInfo(self::ID, $realId, $server, $version, $expires) );
+
+        // setup Identifier
+        $id = new Identifier\UserSupplied(self::ID);
+        $idClaimed = new Identifier\UserSupplied('http://claimed.myopenid.com');
+        $idLocal = new Identifier\UserSupplied('htttp://local.myopenid.com');
+
+        // setup Discovery\Information
+        $info = new Discovery\Service\Html\Result($id);
+        $info
+            ->setEndpointUrl('http://myopenid.com')
+            ->setProtocolVersion(Discovery\Information::OPENID_20_OP)
+            ->setClaimedIdentifier($idClaimed)
+            ->setLocalIdentifier($idLocal);
+        
+        // purge previous data
+        $storage->removeDiscoveryInformation($id);
+
+        // test addition
+        $storage->addDiscoveryInformation($id, $info, $expiresIn);
+        $this->assertInstanceOf('Zend\OpenId\Discovery\Information', $storage->getDiscoveryInformation($id));
+        $infoFromStorage = $storage->getDiscoveryInformation($id);
+        $this->assertSame($id->get(), $infoFromStorage->getSuppliedIdentifier()->get());
+        $this->assertSame(Discovery\Information::OPENID_20_OP, $infoFromStorage->getProtocolVersion());
+        $this->assertSame($idClaimed->get(), $infoFromStorage->getClaimedIdentifier()->get());
+        $this->assertSame($idLocal->get(), $infoFromStorage->getLocalIdentifier()->get());
+        $this->assertTrue($storage->removeDiscoveryInformation($id));
+
+        // test non-existent id
+        $this->assertNull($storage->getDiscoveryInformation($id));
 
         self::_rmDir($dir);
         $storage = new Storage\File($dir);
@@ -375,26 +397,50 @@ class FileTest extends \PHPUnit_Framework_TestCase
         }
 
         chmod($dir, 0);
-        $this->assertFalse( $storage->addDiscoveryInfo(self::ID, self::REAL_ID, self::SERVER, self::VERSION, $expiresIn) );
+
+        try {
+            $storage->addDiscoveryInformation($id, $info, $expiresIn);
+            $ex = null;
+        } catch (Exception $e) {
+            $ex = $e;
+        }
+        $this->assertInstanceOf('\Zend\OpenId\Storage\Exception\LockFailedException', $ex);
+        $this->assertContains('Cannot create a lock file', $ex->getMessage());
+
         chmod($dir, 0777);
         @rmdir($dir);
     }
 
     /**
      * testing getDiscoveryInfo
-     *
+     * @group discoveryInfo
      */
     public function testGetDiscoveryInfoExpiration()
     {
         $tmp = $this->_tmpDir;
         $dir = $tmp . '/openid_consumer';
 
-        $expiresIn = time() + 1;
+        $expiresIn = new Storage\Expiration(time() + 1);
         $storage = new Storage\File($tmp);
-        $storage->delDiscoveryInfo(self::ID);
-        $this->assertTrue( $storage->addDiscoveryInfo(self::ID, self::REAL_ID, self::SERVER, self::VERSION, $expiresIn) );
+        $id = new Identifier\UserSupplied(self::ID);
+
+        $info = new Discovery\Service\Html\Result($id);
+        $info
+            ->setEndpointUrl('http://myopenid.com')
+            ->setProtocolVersion(Discovery\Information::OPENID_20_OP);
+
+        $storage->removeDiscoveryInformation($id);
+        $storage->addDiscoveryInformation($id, $info, $expiresIn);
+
+        $this->assertInstanceOf('Zend\OpenId\Discovery\Information', $storage->getDiscoveryInformation($id));
+        $infoFromStorage = $storage->getDiscoveryInformation($id);
+        $this->assertSame($id->get(), $infoFromStorage->getSuppliedIdentifier()->get());
+        $this->assertSame('http://myopenid.com', $infoFromStorage->getEndpointUrl());
+        $this->assertSame(Discovery\Information::OPENID_20_OP, $infoFromStorage->getProtocolVersion());
+        $this->assertTrue($storage->removeDiscoveryInformation($id));
+
         sleep(2);
-        $this->assertFalse( $storage->getDiscoveryInfo(self::ID, $realId, $server, $version, $expires) );
+        $this->assertNull($storage->getDiscoveryInformation($id));
     }
 
     /**
