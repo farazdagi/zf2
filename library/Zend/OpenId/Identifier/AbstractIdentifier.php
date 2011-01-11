@@ -68,6 +68,18 @@ class AbstractIdentifier
     }
 
     /**
+     * Check if passed Identifier is equal to contained
+     *
+     * @param \Zend\OpenId\Identifier $id Identifier to compare to
+     *
+     * @return boolean
+     */
+    public function equals(\Zend\OpenId\Identifier $id)
+    {
+        return $this->get() === $id->get();
+    }
+
+    /**
      * Although not required by interface (and as such is not guaranteed by 
      * object type), this method helps with debugging Identifiers.
      *
