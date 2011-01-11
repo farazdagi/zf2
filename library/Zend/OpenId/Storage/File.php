@@ -266,34 +266,44 @@ class File
     }
 
     /**
-     * Store information discovered for $identifier
+     * Store information discovered for Identifier
      *
-     * @param \Zend\OpenId\DiscoveryInfo DiscoveryInfo instance
+     * @param \Zend\OpenId\Indentifier Identifier for which discovery is performed
+     * @param \Zend\OpenId\Discovery\Information $disoveryInfo Container with discovered info
+     * @param \Zend\OpenId\Storage\Expiration $expirationInfo When to invalidate data
      *
+     * @throws \Zend\OpenId\Storage\Exception
      * @return \Zend\OpenId\Storage
      */
-    public function addDiscoveryInfo($discoveryInfo)
+    public function addDiscoveryInformation(
+        \Zend\OpenId\Identifier $id,
+        \Zend\OpenId\Discovery\Information $discoveryInfo,
+        \Zend\OpenId\Storage\Expiration $expirationInfo = null)
     {
-        $name = $this->_dir . '/discovery_' . md5($id);
+        // if expiry time not set, expire never
+        if (null === $expirationInfo) {
+            $expirationInfo = new Storage\Expiration(); 
+        }
+
+        $name = $this->_dir . '/discovery_' . md5($id->get());
         $lock = @fopen($this->_dir . '/discovery.lock', 'w+');
         if ($lock === false) {
-            return false;
+            throw new Exception\LockFailedException('Cannot create a lock file');
         }
         if (!flock($lock, LOCK_EX)) {
             fclose($lock);
-            return false;
+            throw new Exception\LockFailedException('Cannot obtain a lock on file');
         }
         try {
             $f = @fopen($name, 'w+');
             if ($f === false) {
                 fclose($lock);
-                return false;
+                throw new Exception\InitializationException('Storage file cannot be created');
             }
-            $data = serialize(array($id, $realId, $server, $version, $expires));
+            $data = serialize(array($discoveryInfo, $expirationInfo));
             fwrite($f, $data);
             fclose($f);
             fclose($lock);
-            return true;
         } catch (\Exception $e) {
             fclose($lock);
             throw $e;
@@ -303,38 +313,40 @@ class File
     /**
      * Get information discovered for $identifier
      *
-     * @param string $identifier Normalized Identifier used in discovery
+     * @param \Zend\OpenId\Identifier $id Normalized Identifier used in discovery
      *
-     * @return \Zend\OpenId\DiscoveryInfo
+     * @return \Zend\OpenId\Discovery\Information
      */
-    public function getDiscoveryInfo($identifier)
+    public function getDiscoveryInformation(\Zend\OpenId\Identifier $id)
     {
-        $name = $this->_dir . '/discovery_' . md5($id);
+        $name = $this->_dir . '/discovery_' . md5($id->get());
         $lock = @fopen($this->_dir . '/discovery.lock', 'w+');
         if ($lock === false) {
-            return false;
+            return null;
         }
         if (!flock($lock, LOCK_EX)) {
             fclose($lock);
-            return false;
+            return null;
         }
         try {
             $f = @fopen($name, 'r');
             if ($f === false) {
                 fclose($lock);
-                return false;
+                return null;
             }
-            $ret = false;
+            $ret = null;
             $data = stream_get_contents($f);
             if (!empty($data)) {
-                list($storedId, $realId, $server, $version, $expires) = unserialize($data);
-                if ($id === $storedId && $expires > time()) {
-                    $ret = true;
+                list($discoveryInfo, $expirationInfo) = unserialize($data);
+                if ($discoveryInfo->getSuppliedIdentifier()->equals($id)  
+                    && $expirationInfo->isNotExpired()
+                ) {
+                    $ret = $discoveryInfo;
                 } else {
                     fclose($f);
                     @unlink($name);
                     fclose($lock);
-                    return false;
+                    return null;
                 }
             }
             fclose($f);
@@ -347,15 +359,15 @@ class File
     }
 
     /**
-     * Remove cached information discovered for $identifier
+     * Remove cached information discovered for Identifier
      *
-     * @param string $identifier Normalized Identifier used in discovery
+     * @param \Zend\OpenId\Identifier $id Identifier used in discovery
      *
-     * @return \Zend\OpenId\Storage
+     * @return boolean True on success, false otherwise
      */
-    public function removeDiscoveryInfo($identifier)
+    public function removeDiscoveryInformation(\Zend\OpenId\Identifier $id)
     {
-        $name = $this->_dir . '/discovery_' . md5($id);
+        $name = $this->_dir . '/discovery_' . md5($id->get());
         $lock = @fopen($this->_dir . '/discovery.lock', 'w+');
         if ($lock === false) {
             return false;
@@ -379,7 +391,7 @@ class File
      *
      * @return \Zend\OpenId\Storage
      */
-    public function cleanupDiscoveryInfo()
+    public function cleanupDiscoveryInformation()
     {
         throw new \Zend\OpenId\Exception\NotImplementedException();
     }
