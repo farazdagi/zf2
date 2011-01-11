@@ -68,38 +68,43 @@ interface Storage
     public function cleanupAssociations();
 
     /**
-     * Store information discovered for $identifier
+     * Store information discovered for Identifier
      *
-     * @param \Zend\OpenId\DiscoveryInfo DiscoveryInfo instance
-     *
-     * @return \Zend\OpenId\Storage
-     */
-    public function addDiscoveryInfo($discoveryInfo);
-
-    /**
-     * Get information discovered for $identifier
-     *
-     * @param string $identifier Normalized Identifier used in discovery
-     *
-     * @return \Zend\OpenId\DiscoveryInfo
-     */
-    public function getDiscoveryInfo($identifier);
-
-    /**
-     * Remove cached information discovered for $identifier
-     *
-     * @param string $identifier Normalized Identifier used in discovery
+     * @param \Zend\OpenId\Indentifier Identifier for which discovery is performed
+     * @param \Zend\OpenId\Discovery\Information $disoveryInfo Container with discovered info
+     * @param \Zend\OpenId\Storage\Expiration $expirationInfo When to invalidate data
      *
      * @return \Zend\OpenId\Storage
      */
-    public function removeDiscoveryInfo($identifier);
+    public function addDiscoveryInformation(
+        \Zend\OpenId\Identifier $id,
+        \Zend\OpenId\Discovery\Information $discoveryInfo,
+        \Zend\OpenId\Storage\Expiration $expirationInfo = null);
+
+    /**
+     * Get information discovered for Identifier
+     *
+     * @param \Zend\OpenId\Identifier $id Normalized Identifier used in discovery
+     *
+     * @return \Zend\OpenId\Discovery\Information
+     */
+    public function getDiscoveryInformation(\Zend\OpenId\Identifier $id);
+
+    /**
+     * Remove cached information discovered for Identifier
+     *
+     * @param \Zend\OpenId\Identifier $id Normalized Identifier used in discovery
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function removeDiscoveryInformation(\Zend\OpenId\Identifier $id);
 
     /**
      * Remove expired discovery data from the cache
      *
      * @return \Zend\OpenId\Storage
      */
-    public function cleanupDiscoveryInfo();
+    public function cleanupDiscoveryInformation();
 
     /**
      * Associate OP Endpoint URL with nonce value to prevent replay attacks
