@@ -48,7 +48,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
         // w/o params
         $expiration = new Storage\Expiration();
         $this->assertNull($expiration->get());
-        $this->assertFalse($expiration->expired());
+        $this->assertFalse($expiration->isExpired());
 
         // w/ params
         $expireTill = time() + 60;
@@ -74,9 +74,11 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
         // test expiry
         $expiration->set(time() + 1);
-        $this->assertFalse($expiration->expired());
+        $this->assertFalse($expiration->isExpired());
+        $this->assertTrue($expiration->isNotExpired());
         sleep(2);
-        $this->assertTrue($expiration->expired());
+        $this->assertTrue($expiration->isExpired());
+        $this->assertFalse($expiration->isNotExpired());
     }
 
     public function testSerialization()
@@ -86,11 +88,13 @@ class FileTest extends \PHPUnit_Framework_TestCase
         $expiration = new Storage\Expiration($expireTill);
         $this->assertEquals($expireTill, $expiration->get());
         sleep(2);
-        $this->assertTrue($expiration->expired());
+        $this->assertTrue($expiration->isExpired());
+        $this->assertFalse($expiration->isNotExpired());
 
         $serializedExpiration = unserialize(serialize($expiration));
         $this->assertEquals($expireTill, $expiration->get());
-        $this->assertTrue($expiration->expired());
+        $this->assertTrue($expiration->isExpired());
+        $this->assertFalse($expiration->isNotExpired());
     }
 
 }
