@@ -75,12 +75,22 @@ class Expiration
      *
      * @return boolean
      */
-    public function expired()
+    public function isExpired()
     {
         if (null === $this->timestamp) {
             return false;
         }
         return $this->timestamp < time();
+    } 
+
+    /**
+     * See if entity is not expired
+     *
+     * @return boolean
+     */
+    public function isNotExpired()
+    {
+        return !$this->isExpired();
     } 
 
     /**
