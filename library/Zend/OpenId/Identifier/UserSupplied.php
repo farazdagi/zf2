@@ -26,10 +26,8 @@ namespace Zend\OpenId\Identifier;
 use Zend\OpenId;
 
 /**
- * Message encoding/format defined in Section 4 of the 
- * {@link http://openid.net/specs/openid-authentication-2_0.html 
- * OpenID 2.0 Specification}. In addition to formats provided by specs, 
- * additional format (TYPE_ARRAY) is added to facilitate development.
+ * User supplied Identifier. No normalization or any other type of post-processing
+ * is applied to this container.
  *
  * @category   Zend
  * @package    Zend_OpenId
