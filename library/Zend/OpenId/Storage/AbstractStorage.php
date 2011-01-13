@@ -35,7 +35,7 @@ abstract class AbstractStorage
     implements Storage
 {
     /**
-     * Reset the storage to its initial state
+     * Cleanup all expired data
      *
      * Internally cleanupAssociations(), cleanupNonces(), and 
      * cleanupDiscoveryInfo() are called
@@ -47,6 +47,22 @@ abstract class AbstractStorage
         $this->cleanupAssociations()
              ->cleanupDiscoveryInfo()
              ->cleanupNonces();
+        return $this;
+    }
+
+    /**
+     * Reset the storage to its initial state
+     *
+     * Internally resetAssociations(), resetNonces(), and 
+     * resetDiscoveryInforomation() called
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function reset()
+    {
+        $this->resetAssociations()
+             ->resetDiscoveryInfo()
+             ->resetNonces();
         return $this;
     }
 }

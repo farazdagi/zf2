@@ -63,9 +63,17 @@ interface Storage
     /**
      * Remove all expired associations
      *
+     * @param int $timestamp
      * @return \Zend\OpenId\Storage
      */
-    public function cleanupAssociations();
+    public function cleanupAssociations($timestamp);
+
+    /**
+     * Remove all associations
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function resetAssociations();
 
     /**
      * Store information discovered for Identifier
@@ -102,9 +110,17 @@ interface Storage
     /**
      * Remove expired discovery data from the cache
      *
+     * @param int $timestamp
      * @return \Zend\OpenId\Storage
      */
-    public function cleanupDiscoveryInformation();
+    public function cleanupDiscoveryInformation($timestamp);
+
+    /**
+     * Remove all discovery data from the cache
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function resetDiscoveryInformation();
 
     /**
      * Associate OP Endpoint URL with nonce value to prevent replay attacks
@@ -126,15 +142,22 @@ interface Storage
     public function removeNonce($url);
 
     /**
-     * Cleanup all exprired nonce data
+     * Cleanup all expired nonce data
      *
      * @param int $timestamp
      * @return \Zend\OpenId\Storage
      */
-    public function cleanupNonces();
+    public function cleanupNonces($timestamp);
 
     /**
-     * Reset the storage to its initial state
+     * Remove all nonce data
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function resetNonces();
+
+    /**
+     * Cleanup all expired data
      *
      * Internally cleanupAssociations(), cleanupNonces(), and 
      * cleanupDiscoveryInfo() are called
@@ -142,4 +165,14 @@ interface Storage
      * @return \Zend\OpenId\Storage
      */
     public function cleanup();
+
+    /**
+     * Reset the storage to its initial state
+     *
+     * Internally resetAssociations(), resetNonces(), and 
+     * resetDiscoveryInforomation() called
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function reset();
 }
