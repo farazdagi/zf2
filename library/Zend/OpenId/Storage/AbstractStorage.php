@@ -45,7 +45,7 @@ abstract class AbstractStorage
     public function cleanup()
     {
         $this->cleanupAssociations()
-             ->cleanupDiscoveryInfo()
+             ->cleanupDiscoveryInformation()
              ->cleanupNonces();
         return $this;
     }
@@ -61,7 +61,7 @@ abstract class AbstractStorage
     public function reset()
     {
         $this->resetAssociations()
-             ->resetDiscoveryInfo()
+             ->resetDiscoveryInformation()
              ->resetNonces();
         return $this;
     }
