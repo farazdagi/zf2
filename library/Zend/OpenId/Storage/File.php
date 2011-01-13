@@ -258,9 +258,20 @@ class File
     /**
      * Remove all expired associations
      *
+     * @param int $timestamp
      * @return \Zend\OpenId\Storage
      */
-    public function cleanupAssociations()
+    public function cleanupAssociations($timestamp)
+    {
+        throw new \Zend\OpenId\Exception\NotImplementedException();
+    }
+
+    /**
+     * Remove all associations
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function resetAssociations()
     {
         throw new \Zend\OpenId\Exception\NotImplementedException();
     }
@@ -389,9 +400,20 @@ class File
     /**
      * Remove expired discovery data from the cache
      *
+     * @param int $timestamp
      * @return \Zend\OpenId\Storage
      */
-    public function cleanupDiscoveryInformation()
+    public function cleanupDiscoveryInformation($timestamp)
+    {
+        throw new \Zend\OpenId\Exception\NotImplementedException();
+    }
+
+    /**
+     * Remove all discovery data from the cache
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function resetDiscoveryInformation()
     {
         throw new \Zend\OpenId\Exception\NotImplementedException();
     }
@@ -449,7 +471,7 @@ class File
      * @param int $timestamp
      * @return \Zend\OpenId\Storage
      */
-    public function cleanupNonces()
+    public function cleanupNonces($timestamp)
     {
         $lock = @fopen($this->_dir . '/nonce.lock', 'w+');
         if ($lock !== false) {
@@ -481,5 +503,15 @@ class File
             }
             throw $e;
         }
+    }
+
+    /**
+     * Remove all nonce data
+     *
+     * @return \Zend\OpenId\Storage
+     */
+    public function resetNonces()
+    {
+        throw new \Zend\OpenId\Exception\NotImplementedException();
     }
 }
