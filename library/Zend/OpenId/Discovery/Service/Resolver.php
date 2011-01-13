@@ -62,6 +62,9 @@ abstract class Resolver
      */
     public function getStorage()
     {
+        if (null === $this->storage) {
+            throw new \Zend\OpenId\Discovery\Exception\StorageNotSet();
+        }
         return $this->storage;
     }
 }
