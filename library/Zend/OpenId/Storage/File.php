@@ -263,7 +263,7 @@ class File
      */
     public function cleanupAssociations($timestamp)
     {
-        throw new \Zend\OpenId\Exception\NotImplementedException();
+        return $this->cleanupByType($timestamp, 'assoc.lock', array('assoc_url_*', 'assoc_handle_*'));
     }
 
     /**
@@ -273,7 +273,7 @@ class File
      */
     public function resetAssociations()
     {
-        throw new \Zend\OpenId\Exception\NotImplementedException();
+        return $this->cleanupAssociations(0);
     }
 
     /**
@@ -405,7 +405,7 @@ class File
      */
     public function cleanupDiscoveryInformation($timestamp)
     {
-        throw new \Zend\OpenId\Exception\NotImplementedException();
+        return $this->cleanupByType($timestamp, 'discovery.lock', array('discovery_*'));
     }
 
     /**
@@ -415,7 +415,7 @@ class File
      */
     public function resetDiscoveryInformation()
     {
-        throw new \Zend\OpenId\Exception\NotImplementedException();
+        return $this->cleanupDiscoveryInformation(0);
     }
 
     /**
@@ -473,36 +473,7 @@ class File
      */
     public function cleanupNonces($timestamp)
     {
-        $lock = @fopen($this->_dir . '/nonce.lock', 'w+');
-        if ($lock !== false) {
-            flock($lock, LOCK_EX);
-        }
-        try {
-            if (!is_int($date) && !is_string($date)) {
-                foreach (glob($this->_dir . '/nonce_*') as $name) {
-                    @unlink($name);
-                }
-            } else {
-                if (is_string($date)) {
-                    $time = time($date);
-                } else {
-                    $time = $date;
-                }
-                foreach (glob($this->_dir . '/nonce_*') as $name) {
-                    if (filemtime($name) < $time) {
-                        @unlink($name);
-                    }
-                }
-            }
-            if ($lock !== false) {
-                fclose($lock);
-            }
-        } catch (\Exception $e) {
-            if ($lock !== false) {
-                fclose($lock);
-            }
-            throw $e;
-        }
+        return $this->cleanupByType($timestamp, 'nonce.lock', array('nonce_*'));
     }
 
     /**
@@ -512,6 +483,40 @@ class File
      */
     public function resetNonces()
     {
-        throw new \Zend\OpenId\Exception\NotImplementedException();
+        return $this->cleanupNonces(0);
+    }
+
+    private function cleanupByType($timestamp, $lockfile, $filetypes)
+    {
+        $lock = @fopen($this->_dir . '/' . $lockfile, 'w+');
+        if ($lock !== false) {
+            flock($lock, LOCK_EX);
+        }
+        if ($lock === false) {
+            throw new Exception\LockFailedException(
+                'Cannot lock ' . $lockfile);
+        }
+        if (!flock($lock, LOCK_EX)) {
+            fclose($lock);
+            throw new Exception\LockFailedException(
+                'Cannot obtain exclusive lock on ' . $lockfile);
+        }
+        try {
+            foreach($filetypes as $type) {
+                foreach (glob($this->_dir . '/' . $type) as $name) {
+                    if (0 === $timestamp) { // purge w/o looking at mtime
+                        @unlink($name);
+                    } elseif (filemtime($name) < $time) {
+                        @unlink($name);
+                    }
+                }
+            }
+            fclose($lock);
+        } catch (\Exception $e) {
+            fclose($lock);
+            throw $e;
+        }
+
+        return $this;
     }
 }
