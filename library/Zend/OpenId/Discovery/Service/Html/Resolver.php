@@ -23,7 +23,12 @@
  * @namespace
  */
 namespace Zend\OpenId\Discovery\Service\Html;
-use Zend\OpenId;
+use Zend\OpenId,
+    Zend\OpenId\Storage,
+    Zend\OpenId\Discovery,
+    Zend\OpenId\Identifier,
+    Zend\OpenId\Discovery\Service\Html\Result as DiscoveryInformation,
+    Zend\OpenId\Discovery\Service\Exception;
 
 /**
  * Simple HTML discovery on URL Identifier
@@ -39,7 +44,10 @@ use Zend\OpenId;
  *      - A LINK element MAY be included with attributes "rel" set 
  *        to "openid2.local_id" and "href" set to the end user's OP-Local Identifier 
  *
- * The protocol version when HTML discovery is performed is "http://specs.openid.net/auth/2.0/signon". 
+ * The protocol version when HTML discovery is performed are:
+ * - "http://specs.openid.net/auth/2.0/signon" 
+ * - "http://openid.net/signon/1.0"
+ * - "http://openid.net/signon/1.1"
  *
  * @category   Zend
  * @package    Zend_OpenId
@@ -62,11 +70,112 @@ class Resolver
      *
      * @param \Zend\OpenId\Identifier Identifier to perform discovery on
      *
-     * @return \Zend\OpenId\Discovery\Result
+     * @return \Zend\OpenId\Discovery\Information
      */
     public function discover(\Zend\OpenId\Identifier $id)
     {
-    }
+        if ($info = $this->getStorage()->getDiscoveryInformation($id)) {
+            return $info;
+        }
+
+        // setup request
+        $client = $this->getHttpClient();
+        if ($client === null) {
+            throw new Exception\DependencyMissingException('HTTP client must be injected');
+        } else {
+        }
+
+        try {
+            $client->resetParameters()
+                   ->setUri($id->get())
+                   ->setMethod(\Zend\Http\Client::GET)
+                   ->setParameterGet(array());
+            $response = $client->request();
+        } catch (\Exception $e) {
+            throw new Exception\HttpRequestFailedException('HTTP Request failed', 0, $e);
+        }
+
+        if (false === $response->isSuccessful()) {
+            throw new Exception\DiscoveryFailedException('Destination page not found or is empty');
+        }
+
+        $status = $response->getStatus();
+        $body = $response->getBody();
+
+        // parse the output
+        if ($status != 200 || !strlen(trim($body))) {
+            return null;
+        }
+
+        $version = Discovery\Information::OPENID_20;
+        $claimedId = $opLocalId = $endpointUrl = null;
+
+        if (preg_match(
+                '/<link[^>]*rel=(["\'])[ \t]*(?:[^ \t"\']+[ \t]+)*?openid2.provider[ \t]*[^"\']*\\1[^>]*href=(["\'])([^"\']+)\\2[^>]*\/?>/i',
+                $body,
+                $r)) {
+            $version = Discovery\Information::OPENID_20;
+            $endpointUrl = $r[3];
+        } else if (preg_match(
+                '/<link[^>]*href=(["\'])([^"\']+)\\1[^>]*rel=(["\'])[ \t]*(?:[^ \t"\']+[ \t]+)*?openid2.provider[ \t]*[^"\']*\\3[^>]*\/?>/i',
+                $body,
+                $r)) {
+            $version = Discovery\Information::OPENID_20;
+            $endpointUrl = $r[2];
+        } else if (preg_match(
+                '/<link[^>]*rel=(["\'])[ \t]*(?:[^ \t"\']+[ \t]+)*?openid.server[ \t]*[^"\']*\\1[^>]*href=(["\'])([^"\']+)\\2[^>]*\/?>/i',
+                $body,
+                $r)) {
+            $version = Discovery\Information::OPENID_11;
+            $endpointUrl = $r[3];
+        } else if (preg_match(
+                '/<link[^>]*href=(["\'])([^"\']+)\\1[^>]*rel=(["\'])[ \t]*(?:[^ \t"\']+[ \t]+)*?openid.server[ \t]*[^"\']*\\3[^>]*\/?>/i',
+                $body,
+                $r)) {
+            $version = Discovery\Information::OPENID_11;
+            $endpointUrl = $r[2];
+        } else {
+            return null;
+        }
+        if ($version == Discovery\Information::OPENID_20) {
+            if (preg_match(
+                    '/<link[^>]*rel=(["\'])[ \t]*(?:[^ \t"\']+[ \t]+)*?openid2.local_id[ \t]*[^"\']*\\1[^>]*href=(["\'])([^"\']+)\\2[^>]*\/?>/i',
+                    $body,
+                    $r)) {
+                $opLocalId = $r[3];
+            } else if (preg_match(
+                    '/<link[^>]*href=(["\'])([^"\']+)\\1[^>]*rel=(["\'])[ \t]*(?:[^ \t"\']+[ \t]+)*?openid2.local_id[ \t]*[^"\']*\\3[^>]*\/?>/i',
+                    $body,
+                    $r)) {
+                $opLocalId = $r[2];
+            }
+        } else {
+            if (preg_match(
+                    '/<link[^>]*rel=(["\'])[ \t]*(?:[^ \t"\']+[ \t]+)*?openid.delegate[ \t]*[^"\']*\\1[^>]*href=(["\'])([^"\']+)\\2[^>]*\/?>/i',
+                    $body,
+                    $r)) {
+                $opLocalId = $r[3];
+            } else if (preg_match(
+                    '/<link[^>]*href=(["\'])([^"\']+)\\1[^>]*rel=(["\'])[ \t]*(?:[^ \t"\']+[ \t]+)*?openid.delegate[ \t]*[^"\']*\\3[^>]*\/?>/i',
+                    $body,
+                    $r)) {
+                $opLocalId = $r[2];
+            }
+        }
+
+        $expiration = new Storage\Expiration(time() + 60 * 60);
+        $info = new DiscoveryInformation();
+        $info->setSuppliedIdentifier($id)
+             ->setProtocolVersion($version)
+             ->setLocalIdentifier(new Identifier\OpLocal($opLocalId))
+             ->setEndpointUrl($endpointUrl);
+
+        // persist/cache info
+        $this->getStorage()
+             ->addDiscoveryInformation($id, $info, $expiration);
+
+        return $info;
+   }
 
     /**
      * Inject HTTP client used as transport in discovery process
@@ -75,7 +184,7 @@ class Resolver
      *
      * @return \Zend\OpenId\Discovery\Service Allow method chaining
      */
-    public function setHttpClient(\Zend\Http\Client $client)
+    public function setHttpClient(\Zend\Http\Client $client = null)
     {
         $this->httpClient = $client;
         return $this;
