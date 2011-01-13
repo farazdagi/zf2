@@ -44,7 +44,7 @@ interface Transport
      *
      * @return \Zend\OpenId\Discovery\Service Allow method chaining
      */
-    public function setHttpClient(\Zend\Http\Client $id);
+    public function setHttpClient(\Zend\Http\Client $client = null);
 
     /**
      * Obtain contained HTTP transport
