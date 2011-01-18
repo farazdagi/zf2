@@ -23,7 +23,7 @@
 /**
  * @namespace
  */
-namespace ZendTest\OpenId\Storage;
+namespace ZendTest\OpenId\Discovery\Service\Html;
 
 use Zend\OpenId\OpenId,
     Zend\OpenId\Identifier,

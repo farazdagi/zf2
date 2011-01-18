@@ -22,7 +22,7 @@
 /**
  * @namespace
  */
-namespace ZendTest\OpenId\Discovery;
+namespace ZendTest\OpenId\Discovery\Service\Html;
 
 use Zend\OpenId\OpenId,
     Zend\OpenId\Discovery\Service\Html\Resolver,
