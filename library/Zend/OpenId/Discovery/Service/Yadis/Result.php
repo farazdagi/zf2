@@ -26,9 +26,7 @@ namespace Zend\OpenId\Discovery\Service\Yadis;
 use Zend\OpenId;
 
 /**
- * Yadis protocol implementation. Given a YadisID, resolver produces
- * Yadis Resource Descriptor, which is parsed into 
- * \Zend\OpenId\Discovery\Information object.
+ * Result of Yadis discovery
  *
  * @category   Zend
  * @package    Zend_OpenId
@@ -36,18 +34,19 @@ use Zend\OpenId;
  * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class Resolver
-    extends OpenId\Discovery\Service\Resolver
-    implements OpenId\Discovery\Service
+class Result
+    extends OpenId\Discovery\Service\Result
+    implements OpenId\Discovery\Information
 {
     /**
-     * Resolve the identifier by performing discovery on it
-     *
-     * @param \Zend\OpenId\Identifier Identifier to perform discovery on
-     *
-     * @return \Zend\OpenId\Discovery\Information
+     * Create container
+     * @param \Zend\OpenId\Identifier $id User-supplied identifier used in dicovery
      */
-    public function discover(\Zend\OpenId\Identifier $id)
+    public function __construct($id = null)
     {
+        parent::__construct($id); // manners
+        // by default OpenID 2.0 protocol is assumed
+        $this->setProtocolVersion(OpenId\Discovery\Information::OPENID_20);
     }
+
 }
