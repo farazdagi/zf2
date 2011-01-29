@@ -200,11 +200,20 @@ abstract class AbstractServiceEndpoint
      *
      * @return \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint
      */
-    public function reset()
+    public function reset($type = self::RESET_ALL)
     {
-        $this
-            ->setTypes(array())
-            ->setUris(array());
+        if ($type & self::RESET_ALL) {
+            $this
+                ->setTypes(array())
+                ->setUris(array());
+        } else {
+            if ($type & self::RESET_TYPES) {
+                $this->setTypes(array());
+            }
+            if ($type & self::RESET_URIS) {
+                $this->setUris(array());
+            }
+        }
         return $this;
     }
 
