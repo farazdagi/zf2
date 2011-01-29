@@ -66,6 +66,13 @@ use Zend\OpenId;
 interface ServiceEndpoint
 {
     /**
+     * Reset type constants
+     */
+    const RESET_ALL = 1;
+    const RESET_TYPES = 2;
+    const RESET_URIS = 4;
+
+    /**
      * Add service type
      *
      * @param string $type Type of service being described
@@ -154,7 +161,10 @@ interface ServiceEndpoint
     /**
      * Reset object inernal state
      *
+     * @param int $type Type of reset. One of:
+     *                  self::RESET_ALL, self::RESET_TYPES, self::RESET_URIS
+     *
      * @return \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint
      */
-    public function reset();
+    public function reset($type = self::RESET_ALL);
 }

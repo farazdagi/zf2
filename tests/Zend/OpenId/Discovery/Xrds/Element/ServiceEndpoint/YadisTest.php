@@ -88,41 +88,92 @@ class YadisTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($types[1], $elService->getType(1));
         $this->assertSame($types, $elService->getTypes());
         $this->assertSame($uris, $elService->getUris());
+    }
 
+    public function testReset()
+    {
+        $elService = new ServiceEndpoint();
+        $types = array(
+            "http://lid.netmesh.org/sso/2.0",
+            "http://lid.netmesh.org/sso/1.0"
+        );
+        $uris = array(
+            "http://www.livejournal.com/openid/server.bml"
+        );
 
+        $elService
+            ->setPriority(10)
+            ->addType($types[0])
+            ->addType($types[1])
+            ->addUri($uris[0]);
 
+        // reset types
+        $elServiceCur = clone $elService;
+        $this->assertSame($types[0], $elServiceCur->getType());
+        $this->assertSame($types[1], $elServiceCur->getType(1));
+        $this->assertSame($uris[0], $elServiceCur->getUri());
+        $this->assertSame(10, $elServiceCur->getPriority());
+        $this->assertSame($types, $elServiceCur->getTypes());
+        $this->assertSame($uris, $elServiceCur->getUris());
+        $elServiceCur
+            ->reset(ServiceEndpoint::RESET_TYPES);
+        $this->assertNull($elServiceCur->getType());
+        $this->assertNull( $elServiceCur->getType(1));
+        $this->assertSame($uris[0], $elServiceCur->getUri());
+        $this->assertSame(10, $elServiceCur->getPriority());
+        $this->assertSame(array(), $elServiceCur->getTypes());
+        $this->assertSame($uris, $elServiceCur->getUris());
 
+        // reset uris
+        $elServiceCur = clone $elService;
+        $this->assertSame($types[0], $elServiceCur->getType());
+        $this->assertSame($types[1], $elServiceCur->getType(1));
+        $this->assertSame($uris[0], $elServiceCur->getUri());
+        $this->assertSame(10, $elServiceCur->getPriority());
+        $this->assertSame($types, $elServiceCur->getTypes());
+        $this->assertSame($uris, $elServiceCur->getUris());
+        $elServiceCur
+            ->reset(ServiceEndpoint::RESET_URIS);
+        $this->assertSame($types[0], $elServiceCur->getType());
+        $this->assertSame($types[1], $elServiceCur->getType(1));
+        $this->assertNull($elServiceCur->getUri());
+        $this->assertSame(10, $elServiceCur->getPriority());
+        $this->assertSame($types, $elServiceCur->getTypes());
+        $this->assertSame(array(), $elServiceCur->getUris());
 
-    //<Service priority="20">
-        //<Type>http://lid.netmesh.org/sso/1.0</Type>
-    //</Service>
+        // reset all
+        $elServiceCur = clone $elService;
+        $this->assertSame($types[0], $elServiceCur->getType());
+        $this->assertSame($types[1], $elServiceCur->getType(1));
+        $this->assertSame($uris[0], $elServiceCur->getUri());
+        $this->assertSame(10, $elServiceCur->getPriority());
+        $this->assertSame($types, $elServiceCur->getTypes());
+        $this->assertSame($uris, $elServiceCur->getUris());
+        $elServiceCur
+            ->reset(ServiceEndpoint::RESET_ALL);
+        $this->assertNull($elServiceCur->getType());
+        $this->assertNull($elServiceCur->getType(1));
+        $this->assertNull($elServiceCur->getUri());
+        $this->assertSame(10, $elServiceCur->getPriority());
+        $this->assertSame(array(), $elServiceCur->getTypes());
+        $this->assertSame(array(), $elServiceCur->getUris());
 
-    //<Service priority="30" xmlns:openid="http://openid.net/xmlns/1.0">
-        //<Type>http://openid.net/signon/1.0</Type>
-        //<URI>http://www.livejournal.com/openid/server.bml</URI>
-        //<openid:Delegate>http://www.livejournal.com/users/frank/</openid:Delegate>
-    //</Service>
-
-    //<Service>
-        //<Type>http://lid.netmesh.org/post/sender/2.0</Type>
-    //</Service>
-
-    //<Service>
-        //<Type>http://lid.netmesh.org/post/receiver/2.0</Type>
-    //</Service>
-
-    //<Service>
-        //<Type>http://lid.netmesh.org/relying-party/2.0</Type>
-    //</Service>
-
-    //<Service>
-        //<Type>http://lid.netmesh.org/traversal/2.0</Type>
-    //</Service>
-
-    //<Service>
-        //<Type>http://lid.netmesh.org/format-negotiation/2.0</Type>
-    //</Service>
-
+        // reset types and uris
+        $elServiceCur = clone $elService;
+        $this->assertSame($types[0], $elServiceCur->getType());
+        $this->assertSame($types[1], $elServiceCur->getType(1));
+        $this->assertSame($uris[0], $elServiceCur->getUri());
+        $this->assertSame(10, $elServiceCur->getPriority());
+        $this->assertSame($types, $elServiceCur->getTypes());
+        $this->assertSame($uris, $elServiceCur->getUris());
+        $elServiceCur
+            ->reset(ServiceEndpoint::RESET_TYPES | ServiceEndpoint::RESET_URIS);
+        $this->assertNull($elServiceCur->getType());
+        $this->assertNull($elServiceCur->getType(1));
+        $this->assertNull($elServiceCur->getUri());
+        $this->assertSame(10, $elServiceCur->getPriority());
+        $this->assertSame(array(), $elServiceCur->getTypes());
+        $this->assertSame(array(), $elServiceCur->getUris());
     }
 }
 
