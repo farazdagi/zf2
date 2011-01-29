@@ -26,7 +26,11 @@ namespace Zend\OpenId\Discovery\Xrds\Element;
 use Zend\OpenId;
 
 /**
- * Container to encapsulate XRD Sequence, abtracts single XRD element.
+ * Container to encapsulate data from XRD Sequence, abtracts single XRD element 
+ * (or, in terms of XRI, XRID - XRI Descriptor).
+ *
+ * Right now serves as container holding collection of 
+ * Discovery\Xrds\Element\ServiceEndpoint elements.
  *
  * From Yadis 1.0 Specs:
  * <xs:element name="XRD">
@@ -74,5 +78,7 @@ use Zend\OpenId;
  * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class ResourceDescriptor
-{}
+interface Descriptor
+{
+    public function addService(\Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint $service);
+}
