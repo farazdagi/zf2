@@ -26,7 +26,7 @@ namespace Zend\OpenId\Discovery\Xrds\Element;
 use Zend\OpenId;
 
 /**
- * Container to encapsulate XRDS Service data
+ * Container to encapsulate resource descriptor's (XRD) service endpoint
  *
  * From Yadis 1.0 Specs:
  * <xs:element name="Service">
@@ -63,5 +63,98 @@ use Zend\OpenId;
  * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class Service
-{}
+interface ServiceEndpoint
+{
+    /**
+     * Add service type
+     *
+     * @param string $type Type of service being described
+     *
+     * @return \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint
+     */
+    public function addType($type);
+
+    /**
+     * Remove specified service type
+     *
+     * @param string $type Type of service being described
+     *
+     * @return \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint
+     */
+    public function removeType($type);
+
+    /**
+     * Check if specified type is found in current service stack
+     *
+     * @param stirng $type Service type to ckeck
+     *
+     * @return boolean
+     */
+    public function hasType($type);
+
+    /**
+     * Get all added service types
+     *
+     * @return array
+     */
+    public function getTypes();
+
+    /**
+     * Set several types at once
+     *
+     * @param array $list Array of strings
+     *
+     * @return \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint
+     */
+    public function setTypes($list);
+
+    /**
+     * Add transport-level URI where the service described may be accessed.
+     *
+     * @param string $uri Location where service may be accessed
+     *
+     * @return \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint
+     */
+    public function addUri($uri);
+
+    /**
+     * Remove specified URI
+     *
+     * @param string $uri Location where service may be accessed
+     *
+     * @return \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint
+     */
+    public function removeUri($uri);
+
+    /**
+     * Fetch (by key) URI at which service may be accessed 
+     *
+     * @param int $key Zero based index of element
+     *
+     * @return string
+     */
+    public function getUri($key = 0);
+
+    /**
+     * Get all URIs registered as service's locations
+     *
+     * @return array
+     */
+    public function getUris();
+
+    /**
+     * Set several URIs at once
+     *
+     * @param array $list Array of service URIs
+     *
+     * @return \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint
+     */
+    public function setUris($list);
+
+    /**
+     * Reset object inernal state
+     *
+     * @return \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint
+     */
+    public function reset();
+}
