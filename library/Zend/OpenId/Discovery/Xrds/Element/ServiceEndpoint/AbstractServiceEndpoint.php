@@ -217,4 +217,22 @@ abstract class AbstractServiceEndpoint
         return $this;
     }
 
+    /**
+     * String uniquely identifying the service object
+     *
+     * @return string
+     */
+    public function getHash()
+    {
+        $hash = '';
+        foreach ($this->getUris() as $uri) {
+            $hash .= $uri;
+        }
+        foreach ($this->getTypes() as $type) {
+            $hash .= $type;
+        }
+
+        return md5($hash);
+    }
+
 }
