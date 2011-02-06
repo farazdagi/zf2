@@ -80,5 +80,24 @@ use Zend\OpenId;
  */
 interface Descriptor
 {
+    /**
+     * Append discovered service endpoint
+     *
+     * @param \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint $service Service to append
+     *
+     * @return \Zend\OpenId\Discovery\Xrds\Element\Descriptor
+     */
     public function addService(\Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint $service);
+
+    /**
+     * Get services registered with descriptor
+     *
+     * @param mixed $type Service type or types. 
+     *                    If null all services are returned. 
+     *                    If string then single service is checked. 
+     *                    If array then multiple services are checked.
+     *
+     * @return array Array of \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint elements
+     */
+    public function getServices($type = null);
 }
