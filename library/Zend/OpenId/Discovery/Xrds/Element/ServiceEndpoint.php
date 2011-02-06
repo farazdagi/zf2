@@ -167,4 +167,11 @@ interface ServiceEndpoint
      * @return \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint
      */
     public function reset($type = self::RESET_ALL);
+
+    /**
+     * String uniquely identifying the service object
+     *
+     * @return string
+     */
+    public function getHash();
 }
