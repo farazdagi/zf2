@@ -175,5 +175,38 @@ class YadisTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(), $elServiceCur->getTypes());
         $this->assertSame(array(), $elServiceCur->getUris());
     }
+
+    public function testHash()
+    {
+        $elService1 = new ServiceEndpoint();
+        $elService2 = new ServiceEndpoint();
+        $elService3 = new ServiceEndpoint();
+
+        $types = array(
+            "http://lid.netmesh.org/sso/2.0",
+            "http://lid.netmesh.org/sso/1.0"
+        );
+        $uris = array(
+            "http://www.livejournal.com/openid/server.bml",
+        );
+
+        $elService1
+            ->addType($types[0])
+            ->addType($types[1])
+            ->addUri($uris[0]);
+        $elService2
+            ->setPriority(20)
+            ->addType($types[0])
+            ->addUri($uris[0]);
+        $elService3
+            ->setPriority(10)
+            ->addType($types[0])
+            ->addType($types[1])
+            ->addUri($uris[0]);
+
+        // services having same types and uris must have identical hash
+        $this->assertSame($elService1->getHash(), $elService3->getHash());
+        $this->assertTrue($elService1->getHash() != $elService2->getHash());
+    }
 }
 
