@@ -171,7 +171,9 @@ interface ServiceEndpoint
     /**
      * String uniquely identifying the service object
      *
+     * @param string $salt Extra string to be used in hashing
+     *
      * @return string
      */
-    public function getHash();
+    public function getHash($salt = '');
 }

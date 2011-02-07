@@ -53,7 +53,12 @@ class Yadis
     extends    OpenId\Discovery\Xrds\Element\ServiceEndpoint\AbstractServiceEndpoint
     implements OpenId\Discovery\Xrds\Element\ServiceEndpoint
 {
-    private $priority = -1;
+    /**
+     * Acc. to Yadis XRDS Schema priority attribute must be non-negative integer
+     *
+     * @var int
+     */
+    private $priority;
 
     /**
      * Set service priority
@@ -64,7 +69,7 @@ class Yadis
      */
     public function setPriority($priority)
     {
-        $this->priority = $priority;
+        $this->priority = (int)$priority;
         return $this;
     }
 
@@ -76,5 +81,18 @@ class Yadis
     public function getPriority()
     {
         return $this->priority;
+    }
+
+    /**
+     * String uniquely identifying the service object
+     * For Yadis services there's and extra priority parameter
+     *
+     * @param string $salt Extra string to be used in hashing
+     *
+     * @return string
+     */
+    public function getHash($salt = '')
+    {
+        return parent::getHash($this->getPriority());
     }
 }
