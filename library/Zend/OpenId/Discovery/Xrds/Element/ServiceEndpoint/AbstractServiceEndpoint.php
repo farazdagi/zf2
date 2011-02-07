@@ -220,11 +220,13 @@ abstract class AbstractServiceEndpoint
     /**
      * String uniquely identifying the service object
      *
+     * @param string $salt Extra string to be used in hashing
+     *
      * @return string
      */
-    public function getHash()
+    public function getHash($salt = '')
     {
-        $hash = '';
+        $hash = $salt;
         foreach ($this->getUris() as $uri) {
             $hash .= $uri;
         }
