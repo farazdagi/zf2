@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xrds:XRDS xmlns:xrds="xri://$xrds" xmlns="xri://$xrd*($v*2.0)">
+
+<XRD>
+    <Service>
+        <Type> http://lid.netmesh.org/sso/2.0 </Type>
+        <Type> http://lid.netmesh.org/custom/2.0 </Type>
+        <URI> http://www.test.ws/?id=1 </URI>
+        <URI> http://www.test.ws/?id=2 </URI>
+    </Service>
+
+    <Service priority="10">
+        <Type> http://lid.netmesh.org/sso/1.0 </Type>
+        <URI> http://www.test.ws/?id=1 </URI>
+    </Service>
+
+    <Service priority="20">
+        <Type> http://lid.netmesh.org/sso/1.0 </Type>
+    </Service>
+</XRD>
+
+</xrds:XRDS>
+
