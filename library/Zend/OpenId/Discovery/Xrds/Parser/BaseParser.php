@@ -50,7 +50,9 @@ abstract class BaseParser
     public function parse($input)
     {
         $tree = $this->loadString($input);
-        $descriptor = $this->getDescriptorInstance();
+        $descriptor = $this->initDescriptorInstance(
+            $this->getDescriptorInstance(), $this->extractDescriptor($tree)
+        );
 
         foreach($this->extractServices($tree) as $serviceElement) {
             $service = $this->getServiceInstance();
@@ -61,45 +63,37 @@ abstract class BaseParser
 
         return $descriptor;
     }
-
     /**
-     * Load XRDS string into tree
+     * Update service instance with values from XRD Service
      *
-     * @param stirng $input Input XML 
+     * @param \Zend\OpenId\Discovery\Xrds\Element\Descriptor $descriptor Descriptor instance to configure
+     * @param \SimpleXMLElement $el XML Element
      *
-     * @return \SimpleXMLElement
+     * @return \Zend\OpenId\Discovery\Xrds\Element\Descriptor
      */
-    private function loadString($input)
+    private function initDescriptorInstance(
+        \Zend\OpenId\Discovery\Xrds\Element\Descriptor $descriptor, 
+        \SimpleXMLElement $el)
     {
-        libxml_clear_errors();
-        libxml_use_internal_errors(true);
-        $tree = simplexml_load_string($input);
-        if (!$tree) {
-            $msg = "Failed loading XML\n";
-            foreach(libxml_get_errors() as $error) {
-                $msg .= "\t" . $error->message;
+        $attr = $el->attributes();
+
+        if ($el->Status->count()) {
+            $statusCode = (int)$el->Status->attributes()->code;
+            if (0 !== $statusCode) {
+                $descriptor->setStatus($statusCode);
             }
-            throw new ParseFailed($msg);
         }
-        return $tree;
     }
 
     /**
-     * Extract services from SimpleXMLElement
+     * Update service instance with values from XRD Service
      *
-     * return \SimpleXMLElement
-     */
-    private function extractServices(\SimpleXMLElement $el)
-    {
-        return $el->XRD->Service;
-    }
-
-    /**
-     * Create XRD Service
+     * @param \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint $service Service instance to configure
+     * @param \SimpleXMLElement $el XML Element
      *
      * @return \Zend\OpenId\Discovery\Xrds\Element\Service
      */
-    public function initServiceInstance(
+    private function initServiceInstance(
         \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint $service, 
         \SimpleXMLElement $el)
     {
@@ -127,4 +121,57 @@ abstract class BaseParser
         return $service;
     }
 
+    /**
+     * Load XRDS string into tree
+     *
+     * @param stirng $input Input XML 
+     *
+     * @return \SimpleXMLElement
+     */
+    private function loadString($input)
+    {
+        libxml_clear_errors();
+        libxml_use_internal_errors(true);
+        $tree = simplexml_load_string($input);
+        if (!$tree) {
+            $msg = "Failed loading XML\n";
+            foreach(libxml_get_errors() as $error) {
+                $msg .= "\t" . $error->message;
+            }
+            throw new ParseFailed($msg);
+        }
+        return $tree;
+    }
+
+    /**
+     * Extract XRD Elements from SimpleXMLElement
+     *
+     * return \SimpleXMLElement
+     */
+    private function extractDescriptor(\SimpleXMLElement $el)
+    {
+        if ($el->XRD->count()) {
+            return $el->XRD;
+        } else if ($el->XRDS->XRD->count()) {
+            return $el->XRDS->XRD;
+        } else {
+            throw Exception\ElementNotFound("XRD element cannot be located in input XRDS");
+        }
+    }
+
+    /**
+     * Extract services from SimpleXMLElement
+     *
+     * return \SimpleXMLElement
+     */
+    private function extractServices(\SimpleXMLElement $el)
+    {
+        if ($el->XRD->count() && $el->XRD->Service->count()) {
+            return $el->XRD->Service;
+        } else if ($el->XRDS->XRD->count() && $el->XRDS->XRD->Service->count()) {
+            return $el->XRDS->XRD->Service;
+        } else {
+            return array();
+        }
+    }
 }
