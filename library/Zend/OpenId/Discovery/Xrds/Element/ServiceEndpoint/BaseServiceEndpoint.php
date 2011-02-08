@@ -74,6 +74,7 @@ abstract class BaseServiceEndpoint
         if (false !== $key) {
             unset($this->types[$key]);
         }
+        $this->types = array_values($this->types); // re-index
         return $this;
     }
 
