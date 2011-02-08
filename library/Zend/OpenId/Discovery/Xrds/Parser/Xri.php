@@ -24,6 +24,7 @@
  */
 namespace Zend\OpenId\Discovery\Xrds\Parser;
 use Zend\OpenId,
+    Zend\OpenId\Discovery\Xrds,
     Zend\OpenId\Discovery\Xrds\Element\Descriptor\Xri as Descriptor,
     Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint\Xri as ServiceEndpoint;
 
@@ -37,11 +38,11 @@ use Zend\OpenId,
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 class Xri
-    extends OpenId\Discovery\Xrds\Parser\AbstractParser
-    implements OpenId\Discovery\Xrds\Parser
+    extends    Xrds\Parser\BaseParser
+    implements Xrds\Parser
 {
     /**
-     * Create XRID element
+     * Create XRD element
      *
      * @return \Zend\OpenId\Discovery\Xrds\Element\Descriptor
      */
@@ -75,6 +76,11 @@ class Xri
             }
         }
 
+        // priority
+        if ((string)$attr->priority) {
+            $service->setPriority((string)$attr->priority);
+        }
+
         return $service;
     }
 
@@ -85,6 +91,6 @@ class Xri
      */
     public function extractServices(\SimpleXMLElement $el)
     {
-        return $el->XRIDescriptor->Service;
+        return $el->XRD->Service;
     }
 }
