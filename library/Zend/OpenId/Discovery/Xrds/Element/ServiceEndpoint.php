@@ -26,7 +26,7 @@ namespace Zend\OpenId\Discovery\Xrds\Element;
 use Zend\OpenId;
 
 /**
- * Container to encapsulate resource descriptor's (XRD) service endpoint
+ * Container to encapsulate resource descriptor's (XRD) single service element
  *
  * From Yadis 1.0 Specs:
  * <xs:element name="Service">
@@ -44,19 +44,28 @@ use Zend\OpenId;
  *  </xs:complexType>
  * <xs:element>
  *
- * From XRI 2.0 Resolution Specs:
- * <xs:element name="Service"> 
- *  <xs:complexType>
- *      <xs:sequence>
- *          <xs:element ref="xrid:Type" minOccurs="0"/>
- *          <xs:group ref="xrid:URI" maxOccurs="unbounded"/>
- *          <xs:element ref="xrid:MediaType" minOccurs="0" maxOccurs="unbounded"/>
- *          <xs:group ref="xrid:otherelement" minOccurs="0" maxOccurs="unbounded"/>
- *      </xs:sequence>
- *      <xs:attributeGroup ref="xrid:otherattribute"/>
- *  </xs:complexType>
- * </xs:element>
+ * From XRI 2.0 Resolution Specs (Community Draft 2):
+ * <xs:element name="Service">
+ *      <xs:complexType>
+ *          <xs:sequence>
+ *              <xs:element ref="xrd:ProviderID" minOccurs="0"/>
+ *              <xs:element ref="xrd:Type" minOccurs="0" maxOccurs="unbounded"/>
+ *              <xs:element ref="xrd:Path" minOccurs="0" maxOccurs="unbounded"/>
+ *              <xs:element ref="xrd:MediaType" minOccurs="0" maxOccurs="unbounded"/>
+ *              <xs:choice>
+ *                  <xs:element ref="xrd:URI" minOccurs="0" maxOccurs="unbounded"/>
+ *                  <xs:element ref="xrd:Redirect" minOccurs="0" maxOccurs="unbounded"/>
+ *                  <xs:element ref="xrd:Ref" minOccurs="0" maxOccurs="unbounded"/>
+ *              </xs:choice>
+ *              <xs:element ref="xrd:LocalID" minOccurs="0" maxOccurs="unbounded"/>
+ *              <xs:group ref="xrd:otherelement" minOccurs="0" maxOccurs="unbounded"/>
+ *          </xs:sequence>
+ *          <xs:attributeGroup ref="xrd:priorityAttrGrp"/>
+ *          <xs:attributeGroup ref="xrd:otherattribute"/>
+ *      </xs:complexType>
+ *  </xs:element>
  *
+ * @see http://docs.oasis-open.org/xri/2.0/specs/cd02/xrd.xsd
  * @category   Zend
  * @package    Zend_OpenId
  * @subpackage Zend_OpenId_Discovery
