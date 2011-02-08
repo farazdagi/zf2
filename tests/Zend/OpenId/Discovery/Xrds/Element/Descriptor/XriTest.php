@@ -57,13 +57,16 @@ class XriTest extends \PHPUnit_Framework_TestCase
         );
 
         $elService1
+            ->setPriority(10)
             ->addType($types[0])
             ->addType($types[1])
             ->addUri($uris[0]);
         $elService2
+            ->setPriority(20)
             ->addType($types[0])
             ->addUri($uris[0]);
         $elService3
+            ->setPriority(30)
             ->addType($types[1])
             ->addUri($uris[0]);
 
@@ -75,46 +78,72 @@ class XriTest extends \PHPUnit_Framework_TestCase
         // get all services
         $services = $elDescriptor->getServices();
         $this->assertTrue(is_array($services));
-        $this->assertEquals(2, count($services));
+        $this->assertEquals(3, count($services));
 
-        $this->assertFalse($services[0]->hasType($types[0]));
+        $this->assertTrue($services[0]->hasType($types[0]));
         $this->assertTrue($services[0]->hasType($types[1]));
         $this->assertSame($uris[0], $services[0]->getUri());
+        $this->assertSame(10, $services[0]->getPriority());
 
         $this->assertTrue($services[1]->hasType($types[0]));
         $this->assertFalse($services[1]->hasType($types[1]));
         $this->assertSame($uris[0], $services[1]->getUri());
+        $this->assertSame(20, $services[1]->getPriority());
+
+        $this->assertFalse($services[2]->hasType($types[0]));
+        $this->assertTrue($services[2]->hasType($types[1]));
+        $this->assertSame($uris[0], $services[2]->getUri());
+        $this->assertSame(30, $services[2]->getPriority());
 
         // get all by passing type array
-        $services = $elDescriptor->getServices(array($types[1], $types[0]));
+        $services = $elDescriptor->getServices($types);
         $this->assertTrue(is_array($services));
-        $this->assertEquals(2, count($services));
+        $this->assertEquals(3, count($services));
 
-        $this->assertFalse($services[0]->hasType($types[0]));
+        $this->assertTrue($services[0]->hasType($types[0]));
         $this->assertTrue($services[0]->hasType($types[1]));
         $this->assertSame($uris[0], $services[0]->getUri());
+        $this->assertSame(10, $services[0]->getPriority());
 
         $this->assertTrue($services[1]->hasType($types[0]));
         $this->assertFalse($services[1]->hasType($types[1]));
         $this->assertSame($uris[0], $services[1]->getUri());
+        $this->assertSame(20, $services[1]->getPriority());
+
+        $this->assertFalse($services[2]->hasType($types[0]));
+        $this->assertTrue($services[2]->hasType($types[1]));
+        $this->assertSame($uris[0], $services[2]->getUri());
+        $this->assertSame(30, $services[2]->getPriority());
 
         // get single type service - type[0]
         $services = $elDescriptor->getServices($types[0]);
         $this->assertTrue(is_array($services));
-        $this->assertEquals(1, count($services));
+        $this->assertEquals(2, count($services));
 
         $this->assertTrue($services[0]->hasType($types[0]));
-        $this->assertFalse($services[0]->hasType($types[1]));
+        $this->assertTrue($services[0]->hasType($types[1]));
         $this->assertSame($uris[0], $services[0]->getUri());
+        $this->assertSame(10, $services[0]->getPriority());
+
+        $this->assertTrue($services[1]->hasType($types[0]));
+        $this->assertFalse($services[1]->hasType($types[1]));
+        $this->assertSame($uris[0], $services[1]->getUri());
+        $this->assertSame(20, $services[1]->getPriority());
 
         // get single type service - type[1]
         $services = $elDescriptor->getServices($types[1]);
         $this->assertTrue(is_array($services));
-        $this->assertEquals(1, count($services));
+        $this->assertEquals(2, count($services));
 
-        $this->assertFalse($services[0]->hasType($types[0]));
+        $this->assertTrue($services[0]->hasType($types[0]));
         $this->assertTrue($services[0]->hasType($types[1]));
         $this->assertSame($uris[0], $services[0]->getUri());
+        $this->assertSame(10, $services[0]->getPriority());
+
+        $this->assertFalse($services[1]->hasType($types[0]));
+        $this->assertTrue($services[1]->hasType($types[1]));
+        $this->assertSame($uris[0], $services[1]->getUri());
+        $this->assertSame(30, $services[1]->getPriority());
 
     }
 }
