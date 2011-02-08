@@ -53,21 +53,23 @@ class XriTest extends \PHPUnit_Framework_TestCase
 
         $elService
             ->addType($types[0])
-            ->addType($types[1]) // overrides previously set value
+            ->addType($types[1])
             ->addUri($uris[0]);
 
-        $this->assertFalse($elService->hasType($types[0]));
-        $this->assertSame($types[1], $elService->getType());
+        $this->assertTrue($elService->hasType($types[0]));
+        $this->assertTrue($elService->hasType($types[1]));
+        $this->assertSame($types[0], $elService->getType());
         $this->assertSame($uris[0], $elService->getUri());
         
         // removal
+        $this->assertTrue($elService->hasType($types[0]));
         $this->assertTrue($elService->hasType($types[1]));
         $this->assertSame($uris[0], $elService->getUri());
         $elService
-            ->removeType($types[1])
+            ->removeType($types[0])
             ->removeUri($uris[0]);
-        $this->assertFalse($elService->hasType($types[1]));
-        $this->assertNull($elService->getType());
+        $this->assertFalse($elService->hasType($types[0]));
+        $this->assertSame($types[1], $elService->getType());
         $this->assertNull($elService->getUri());
 
         // reset and mass add
@@ -82,9 +84,10 @@ class XriTest extends \PHPUnit_Framework_TestCase
         $elService
             ->setTypes($types)
             ->setUris($uris);
-        $this->assertFalse($elService->hasType($types[0]));
-        $this->assertSame($types[1], $elService->getType());
-        $this->assertSame(array_slice($types, -1), $elService->getTypes());
+        $this->assertTrue($elService->hasType($types[0]));
+        $this->assertTrue($elService->hasType($types[1]));
+        $this->assertSame($types[0], $elService->getType());
+        $this->assertSame($types, $elService->getTypes());
         $this->assertSame($uris, $elService->getUris());
     }
 
@@ -154,30 +157,6 @@ class XriTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($elServiceCur->getUri());
         $this->assertSame(array(), $elServiceCur->getTypes());
         $this->assertSame(array(), $elServiceCur->getUris());
-    }
-
-    public function testTypeSingularity()
-    {
-        $elService = new ServiceEndpoint();
-        $types = array(
-            "http://lid.netmesh.org/sso/2.0",
-            "http://lid.netmesh.org/sso/1.0"
-        );
-        $uris = array(
-            "http://www.livejournal.com/openid/server.bml"
-        );
-
-        $elService
-            ->addType($types[0])
-            ->addType($types[1]) // overrides previously set value
-            ->addUri($uris[0]);
-        $this->assertFalse($elService->hasType($types[0]));
-        $this->assertSame($types[1], $elService->getType());
-        $this->assertSame($uris[0], $elService->getUri());
-        $this->setExpectedException(
-            '\Zend\OpenId\Discovery\Xrds\Exception\ElementFailsValidationException', 
-            'XRI 2.0 Resolution specified 0 or 1 modifier for xrid:XRIDescriptor/xrid:Service/xrid:Type');
-        $elService->getType("non-existent-key");
     }
 
     public function testHash()
