@@ -24,6 +24,7 @@
  */
 namespace Zend\OpenId\Discovery\Xrds\Parser;
 use Zend\OpenId,
+    Zend\OpenId\Discovery\Xrds,
     Zend\OpenId\Discovery\Xrds\Exception\ParseFailedException as ParseFailed;
 
 /**
@@ -35,7 +36,8 @@ use Zend\OpenId,
  * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-abstract class AbstractParser
+abstract class BaseParser
+    implements Xrds\Parser
 {
     /**
      * Parse input XRDS string into Descriptor object

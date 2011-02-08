@@ -24,6 +24,7 @@
  */
 namespace Zend\OpenId\Discovery\Xrds\Parser;
 use Zend\OpenId,
+    Zend\OpenId\Discovery\Xrds,
     Zend\OpenId\Discovery\Xrds\Element\Descriptor\Yadis as Descriptor,
     Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint\Yadis as ServiceEndpoint;
 
@@ -37,8 +38,8 @@ use Zend\OpenId,
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 class Yadis
-    extends OpenId\Discovery\Xrds\Parser\AbstractParser
-    implements OpenId\Discovery\Xrds\Parser
+    extends    Xrds\Parser\BaseParser
+    implements Xrds\Parser
 {
     /**
      * Create XRD element

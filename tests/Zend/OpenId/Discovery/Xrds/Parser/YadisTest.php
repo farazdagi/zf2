@@ -38,7 +38,7 @@ use Zend\OpenId\OpenId,
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  * @group      Zend_OpenId
  */
-class DefaultParserTest extends \PHPUnit_Framework_TestCase
+class YadisTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {}
@@ -116,8 +116,8 @@ class DefaultParserTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(), $services[2]->getUris());
         $this->assertNull($services[2]->getUri());
         $this->assertSame(20, $services[2]->getPriority());
-
     }
+
     public function testParseFailedException()
     {
         $this->setExpectedException(
