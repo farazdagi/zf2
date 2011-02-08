@@ -23,7 +23,8 @@
  * @namespace
  */
 namespace Zend\OpenId\Discovery\Xrds\Element\Descriptor;
-use Zend\OpenId;
+use Zend\OpenId,
+    Zend\OpenId\Discovery\Xrds\Element;
 
 /**
  * Container to encapsulate data from XRD Sequence, abtracts single XRD element 
@@ -56,6 +57,6 @@ use Zend\OpenId;
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 class Yadis
-    extends OpenId\Discovery\Xrds\Element\Descriptor\AbstractDescriptor
-    implements OpenId\Discovery\Xrds\Element\Descriptor
+    extends BaseDescriptor
+    implements Element\Descriptor
 {}
