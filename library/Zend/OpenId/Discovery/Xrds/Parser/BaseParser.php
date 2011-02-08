@@ -69,6 +69,7 @@ abstract class BaseParser
      */
     private function loadString($input)
     {
+        libxml_clear_errors();
         libxml_use_internal_errors(true);
         $tree = simplexml_load_string($input);
         if (!$tree) {
