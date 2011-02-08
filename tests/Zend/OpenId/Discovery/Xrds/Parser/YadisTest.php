@@ -43,7 +43,7 @@ class DefaultParserTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {}
 
-    public function testYadisParser()
+    public function testParserSimpleYadis()
     {
         $types = array(
             "http://lid.netmesh.org/sso/2.0",
