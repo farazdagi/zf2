@@ -46,51 +46,18 @@ class Xri
      *
      * @return \Zend\OpenId\Discovery\Xrds\Element\Descriptor
      */
-    public function createDescriptor()
+    public function getDescriptorInstance()
     {
         return new Descriptor();
     }
 
     /**
-     * Create XRD Service
+     * Create XRD's Service element
      *
-     * @return \Zend\OpenId\Discovery\Xrds\Element\Service
+     * @return \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint
      */
-    public function createService(\SimpleXMLElement $el)
+    public function getServiceInstance()
     {
-        $attr = $el->attributes();
-
-        $service = new ServiceEndpoint();
-
-        // type
-        if ($el->Type->count()) {
-            foreach ($el->Type as $type) {
-                $service->addType(trim((string)$type));
-            }
-        }
-
-        // service location
-        if ($el->URI->count()) {
-            foreach ($el->URI as $uri) {
-                $service->addUri(trim((string)$uri));
-            }
-        }
-
-        // priority
-        if ((string)$attr->priority) {
-            $service->setPriority((string)$attr->priority);
-        }
-
-        return $service;
-    }
-
-    /**
-     * Extract services from SimpleXMLElement
-     *
-     * return \SimpleXMLElement
-     */
-    public function extractServices(\SimpleXMLElement $el)
-    {
-        return $el->XRD->Service;
+        return new ServiceEndpoint();
     }
 }

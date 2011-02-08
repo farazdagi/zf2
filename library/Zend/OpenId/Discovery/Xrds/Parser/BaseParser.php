@@ -25,6 +25,7 @@
 namespace Zend\OpenId\Discovery\Xrds\Parser;
 use Zend\OpenId,
     Zend\OpenId\Discovery\Xrds,
+    Zend\OpenId\Discovery\Xrds\Element,
     Zend\OpenId\Discovery\Xrds\Exception\ParseFailedException as ParseFailed;
 
 /**
@@ -49,11 +50,12 @@ abstract class BaseParser
     public function parse($input)
     {
         $tree = $this->loadString($input);
-        $descriptor = $this->createDescriptor();
+        $descriptor = $this->getDescriptorInstance();
 
-        foreach($this->extractServices($tree) as $service) {
+        foreach($this->extractServices($tree) as $serviceElement) {
+            $service = $this->getServiceInstance();
             $descriptor->addService(
-                $this->createService($service)
+                $this->initServiceInstance($service, $serviceElement)
             );
         }
 
@@ -80,6 +82,49 @@ abstract class BaseParser
             throw new ParseFailed($msg);
         }
         return $tree;
+    }
+
+    /**
+     * Extract services from SimpleXMLElement
+     *
+     * return \SimpleXMLElement
+     */
+    private function extractServices(\SimpleXMLElement $el)
+    {
+        return $el->XRD->Service;
+    }
+
+    /**
+     * Create XRD Service
+     *
+     * @return \Zend\OpenId\Discovery\Xrds\Element\Service
+     */
+    public function initServiceInstance(
+        \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint $service, 
+        \SimpleXMLElement $el)
+    {
+        $attr = $el->attributes();
+
+        // type
+        if ($el->Type->count()) {
+            foreach ($el->Type as $type) {
+                $service->addType(trim((string)$type));
+            }
+        }
+
+        // service location
+        if ($el->URI->count()) {
+            foreach ($el->URI as $uri) {
+                $service->addUri(trim((string)$uri));
+            }
+        }
+
+        // priority
+        if ((string)$attr->priority) {
+            $service->setPriority((string)$attr->priority);
+        }
+
+        return $service;
     }
 
 }
