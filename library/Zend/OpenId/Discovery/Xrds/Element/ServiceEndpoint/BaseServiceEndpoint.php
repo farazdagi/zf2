@@ -49,6 +49,12 @@ abstract class BaseServiceEndpoint
     private $uris = array();
 
     /**
+     * According to XRD schema xs:nonNegativeInteger
+     * @var integer
+     */
+    private $priority;
+
+    /**
      * Add service type
      *
      * @param string $type Type of service being described
@@ -220,6 +226,29 @@ abstract class BaseServiceEndpoint
     }
 
     /**
+     * Set service priority
+     *
+     * @param int $priority Priority value
+     *
+     * @return \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint\Yadis
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = (int)$priority;
+        return $this;
+    }
+
+    /**
+     * Get service priority
+     *
+     * @return int
+     */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
+
+    /**
      * String uniquely identifying the service object
      *
      * @param string $salt Extra string to be used in hashing
@@ -229,6 +258,7 @@ abstract class BaseServiceEndpoint
     public function getHash($salt = '')
     {
         $hash = $salt;
+        $hash .= (int)$this->getPriority();
         foreach ($this->getUris() as $uri) {
             $hash .= $uri;
         }

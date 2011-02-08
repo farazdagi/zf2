@@ -23,7 +23,8 @@
  * @namespace
  */
 namespace Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint;
-use Zend\OpenId;
+use Zend\OpenId,
+    Zend\OpenId\Discovery\Xrds\Element;
 
 /**
  * Container to encapsulate XRDS Service data for Yadis schema
@@ -50,49 +51,6 @@ use Zend\OpenId;
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 class Yadis
-    extends    OpenId\Discovery\Xrds\Element\ServiceEndpoint\AbstractServiceEndpoint
-    implements OpenId\Discovery\Xrds\Element\ServiceEndpoint
-{
-    /**
-     * Acc. to Yadis XRDS Schema priority attribute must be non-negative integer
-     *
-     * @var int
-     */
-    private $priority;
-
-    /**
-     * Set service priority
-     *
-     * @param int $priority Priority value
-     *
-     * @return \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint\Yadis
-     */
-    public function setPriority($priority)
-    {
-        $this->priority = (int)$priority;
-        return $this;
-    }
-
-    /**
-     * Get service priority
-     *
-     * @return int
-     */
-    public function getPriority()
-    {
-        return $this->priority;
-    }
-
-    /**
-     * String uniquely identifying the service object
-     * For Yadis services there's and extra priority parameter
-     *
-     * @param string $salt Extra string to be used in hashing
-     *
-     * @return string
-     */
-    public function getHash($salt = '')
-    {
-        return parent::getHash($this->getPriority());
-    }
-}
+    extends    BaseServiceEndpoint
+    implements Element\ServiceEndpoint
+{}
