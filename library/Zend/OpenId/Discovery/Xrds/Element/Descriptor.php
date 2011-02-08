@@ -105,4 +105,21 @@ interface Descriptor
      * @return array Array of \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint elements
      */
     public function getServices($type = null);
+
+    /**
+     * Client-side status of a resolution query.
+     * For more info check Section 15 of XRI Resolution 2.0
+     *
+     * @param int $status Status to set
+     *
+     * @reutrn \Zend\OpenId\Discovery\Xrds\Element\Descriptor
+     */
+    public function setStatus($status);
+
+    /**
+     * Get client-side resolution status
+     *
+     * @return int
+     */
+    public function getStatus();
 }

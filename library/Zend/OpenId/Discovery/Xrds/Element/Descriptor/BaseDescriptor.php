@@ -46,6 +46,13 @@ abstract class BaseDescriptor
     private $services = array();
 
     /**
+     * Client-side status of query resolution
+     *
+     * @var int
+     */
+    private $status = 100;
+
+    /**
      * Append discovered service endpoint
      *
      * @param \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint $service Service to append
@@ -87,6 +94,29 @@ abstract class BaseDescriptor
         }
 
         return array_values($this->services);
+    }
+
+    /**
+     * Client-side status of a resolution query.
+     * For more info check Section 15 of XRI Resolution 2.0
+     *
+     * @param int $status Status to set
+     *
+     * @reutrn \Zend\OpenId\Discovery\Xrds\Element\Descriptor
+     */
+    public function setStatus($status)
+    {
+        $this->status = (int)$status;
+    }
+
+    /**
+     * Get client-side resolution status
+     *
+     * @return int
+     */
+    public function getStatus()
+    {
+        return $this->status;
     }
 
     /**
