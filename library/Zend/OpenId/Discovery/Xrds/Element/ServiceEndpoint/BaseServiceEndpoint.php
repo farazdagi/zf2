@@ -155,6 +155,7 @@ abstract class BaseServiceEndpoint
         if (false !== $key) {
             unset($this->uris[$key]);
         }
+        $this->uris = array_values($this->uris); // re-index
         return $this;
     }
 
