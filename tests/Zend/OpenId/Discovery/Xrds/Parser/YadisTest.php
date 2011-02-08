@@ -25,6 +25,7 @@
 namespace ZendTest\OpenId\Discovery\Xrds\Parser;
 
 use Zend\OpenId\OpenId,
+    Zend\OpenId\Discovery\Information as DiscoveryInfo,
     Zend\OpenId\Discovery\Xrds\Element,
     Zend\OpenId\Discovery\Xrds\Parser\Yadis as Parser,
     Zend\OpenId\Discovery,
@@ -116,6 +117,32 @@ class YadisTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array(), $services[2]->getUris());
         $this->assertNull($services[2]->getUri());
         $this->assertSame(20, $services[2]->getPriority());
+    }
+
+    public function testOpenIdService()
+    {
+        $uris = array(
+            "http://www.myopenid.com/server",
+            "http://www.livejournal.com/openid/server.bml",
+        );
+
+        $parser = new Parser();
+        $xrds =  file_get_contents(
+            dirname(__FILE__) . '/xrds_files/yadis.openid.xml');
+        $descriptor = $parser->parse($xrds);
+
+        $this->assertInstanceOf('\Zend\OpenId\Discovery\Xrds\Element\Descriptor', $descriptor);
+        
+        // get all services
+        $services = $descriptor->getServices();
+        $this->assertTrue(is_array($services));
+        $this->assertEquals(4, count($services));
+
+        $this->assertTrue($services[0]->hasType(DiscoveryInfo::OPENID_10));
+        $this->assertSame($uris[0], $services[0]->getUri());
+
+        $this->assertTrue($services[1]->hasType(DiscoveryInfo::OPENID_20));
+        $this->assertSame($uris[1], $services[1]->getUri());
     }
 
     public function testParseFailedException()
