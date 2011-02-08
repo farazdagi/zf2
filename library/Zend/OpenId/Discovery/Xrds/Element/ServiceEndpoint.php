@@ -178,6 +178,22 @@ interface ServiceEndpoint
     public function reset($type = self::RESET_ALL);
 
     /**
+     * Set service priority
+     *
+     * @param int $priority Priority value
+     *
+     * @return \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint\Yadis
+     */
+    public function setPriority($priority);
+
+    /**
+     * Get service priority
+     *
+     * @return int
+     */
+    public function getPriority();
+
+    /**
      * String uniquely identifying the service object
      *
      * @param string $salt Extra string to be used in hashing
