@@ -23,11 +23,11 @@
  * @namespace
  */
 namespace Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint;
-use Zend\OpenId;
+use Zend\OpenId,
+    Zend\OpenId\Discovery\Xrds\Element;
 
 /**
- * Default implimentation of common XRD Service functionality
- *
+ * Implementation of common methods for ServiceEndpoint interface
  *
  * @category   Zend
  * @package    Zend_OpenId
@@ -35,8 +35,8 @@ use Zend\OpenId;
  * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-abstract class AbstractServiceEndpoint
-    implements OpenId\Discovery\Xrds\Element\ServiceEndpoint
+abstract class BaseServiceEndpoint
+    implements Element\ServiceEndpoint
 { 
     /**
      * Service type

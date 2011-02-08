@@ -23,11 +23,11 @@
  * @namespace
  */
 namespace Zend\OpenId\Discovery\Xrds\Element\Descriptor;
-use Zend\OpenId;
+use Zend\OpenId,
+    Zend\OpenId\Discovery\Xrds\Element;
 
 /**
- * Abstract implementation of common methods of container to encapsulate data 
- * from XRD Sequence, which abtracts single XRD element 
+ * Implementation of common methods for Descriptor interface
  *
  * @category   Zend
  * @package    Zend_OpenId
@@ -35,8 +35,8 @@ use Zend\OpenId;
  * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class AbstractDescriptor
-    implements OpenId\Discovery\Xrds\Element\Descriptor
+abstract class BaseDescriptor
+    implements Element\Descriptor
 {
     /**
      * Registrered service endpoints
