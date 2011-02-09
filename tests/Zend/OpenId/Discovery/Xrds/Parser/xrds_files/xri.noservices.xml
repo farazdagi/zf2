@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XRDS ref="xri://=cleverman" xmlns="xri://$xrds">
+    <XRD version="2.0" xmlns="xri://$xrd*($v*2.0)">
+        <Query>*cleverman</Query>
+        <Status ceid="off" cid="verified" code="100"/>
+        <ServerStatus code="100"/>
+        <Expires>2011-02-08T09:27:50.000Z</Expires>
+        <ProviderID>xri://=</ProviderID>
+        <LocalID>!f83.62b1.44f.2813</LocalID>
+        <CanonicalID>=!F83.62B1.44F.2813</CanonicalID>
+    </XRD>
+</XRDS>
