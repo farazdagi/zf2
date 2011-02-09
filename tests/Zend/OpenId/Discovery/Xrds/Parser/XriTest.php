@@ -25,6 +25,7 @@
 namespace ZendTest\OpenId\Discovery\Xrds\Parser;
 
 use Zend\OpenId\OpenId,
+    Zend\OpenId\Discovery\Information as DiscoveryInformation,
     Zend\OpenId\Discovery\Xrds\Element,
     Zend\OpenId\Discovery\Xrds\Parser\Xri as Parser,
     Zend\OpenId\Discovery,
@@ -43,20 +44,10 @@ class XriTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {}
 
-    public function testParser()
+    public function testServicesXml()
     {
-        $types = array(
-            "http://lid.netmesh.org/sso/2.0",
-            "http://lid.netmesh.org/sso/1.0",
-            "http://lid.netmesh.org/custom/2.0",
-        );
-        $uris = array(
-            "http://www.test.ws/?id=1",
-            "http://www.test.ws/?id=2",
-        );
-
         $parser = new Parser();
-        $xrds =  file_get_contents(dirname(__FILE__) . '/xrds_files/yadis.simple.xml');
+        $xrds =  file_get_contents(dirname(__FILE__) . '/xrds_files/xri.services.xml');
         $descriptor = $parser->parse($xrds);
 
         $this->assertInstanceOf('\Zend\OpenId\Discovery\Xrds\Element\Descriptor', $descriptor);
@@ -64,11 +55,112 @@ class XriTest extends \PHPUnit_Framework_TestCase
         // get all services
         $services = $descriptor->getServices();
 
+        $this->assertTrue(is_array($services));
+        $this->assertSame(3, count($services));
+
+        list($s1, $s2, $s3) = $services;
+
+        $this->assertSame(DiscoveryInformation::OPENID_10, $s1->getType());
+        $this->assertSame('http://www.myopenid.com/server', $s1->getUri());
+
+        $this->assertSame('http://my.blog/url', $s2->getUri());
+
+        $this->assertSame('skype:call?myskypeusername', $s3->getUri());
+
     }
+
+    public function testXrdXml()
+    {
+        $parser = new Parser();
+        $xrds =  file_get_contents(dirname(__FILE__) . '/xrds_files/xri.xrd.xml');
+        $descriptor = $parser->parse($xrds);
+
+        $this->assertInstanceOf('\Zend\OpenId\Discovery\Xrds\Element\Descriptor', $descriptor);
+        
+        // get all services
+        $services = $descriptor->getServices();
+
+        $this->assertTrue(is_array($services));
+        $this->assertSame(2, count($services));
+
+        list($s1, $s2) = $services;
+
+        $this->assertSame('xri://+i-service*(+forwarding)*($v*1.0)', $s1->getType());
+        $this->assertSame('http://1id.com/', $s1->getUri());
+        $this->assertSame(10, $s1->getPriority());
+
+        $this->assertSame('xri://+i-service*(+contact)*($v*1.0)', $s2->getType());
+        $this->assertSame('http://1id.com/contact/', $s2->getUri());
+        $this->assertSame(20, $s2->getPriority());
+
+    }
+
+    public function testXrdsXml()
+    {
+        $parser = new Parser();
+        $xrds =  file_get_contents(dirname(__FILE__) . '/xrds_files/xri.xrds.xml');
+        $descriptor = $parser->parse($xrds);
+
+        $this->assertInstanceOf('\Zend\OpenId\Discovery\Xrds\Element\Descriptor', $descriptor);
+        
+        // get all services
+        $services = $descriptor->getServices();
+
+        $this->assertTrue(is_array($services));
+        $this->assertSame(5, count($services));
+
+        list($s1, $s2) = $services;
+
+        $this->assertSame('xri://+i-service*(+contact)*($v*1.0)', $s1->getType());
+        $this->assertSame('http://1id.com/contact/', $s1->getUri());
+        $this->assertSame(10, $s1->getPriority());
+
+        $this->assertSame('http://openid.net/signon/1.0', $s2->getType());
+        $this->assertSame('https://1id.com/sso/', $s2->getUri());
+        $this->assertSame(20, $s2->getPriority());
+    }
+
+    public function testNoServicesXml()
+    {
+        $parser = new Parser();
+        $xrds =  file_get_contents(dirname(__FILE__) . '/xrds_files/xri.noservices.xml');
+        $descriptor = $parser->parse($xrds);
+
+        $this->assertInstanceOf('\Zend\OpenId\Discovery\Xrds\Element\Descriptor', $descriptor);
+
+        // get all services
+        $services = $descriptor->getServices();
+
+        $this->assertTrue(is_array($services));
+        $this->assertSame(0, count($services));
+    }
+
+    public function testDescriptorStatus()
+    {
+        $parser = new Parser();
+        $xrds =  file_get_contents(dirname(__FILE__) . '/xrds_files/xri.notfound.xml');
+        $descriptor = $parser->parse($xrds);
+
+        $this->assertInstanceOf('\Zend\OpenId\Discovery\Xrds\Element\Descriptor', $descriptor);
+
+        $this->assertSame(222, $descriptor->getStatus());
+    }
+
+    public function testDescriptorElementNotFoundException()
+    {
+        $this->setExpectedException(
+            'Zend\OpenId\Discovery\Xrds\Parser\Exception\ElementNotFoundException', 
+            "XRD element cannot be located in input XRDS");
+
+        $parser = new Parser();
+        $xrds =  file_get_contents(dirname(__FILE__) . '/xrds_files/xri.xrd.notfound.xml');
+        $descriptor = $parser->parse($xrds);
+    }
+
     public function testParseFailedException()
     {
         $this->setExpectedException(
-            '\Zend\OpenId\Discovery\Xrds\Exception\ParseFailedException', 
+            'Zend\OpenId\Discovery\Xrds\Parser\Exception\ParseFailedException', 
             "Couldn't find end of Start Tag XRDS");
 
         $parser = new Parser();

@@ -148,7 +148,7 @@ class YadisTest extends \PHPUnit_Framework_TestCase
     public function testParseFailedException()
     {
         $this->setExpectedException(
-            '\Zend\OpenId\Discovery\Xrds\Exception\ParseFailedException', 
+            'Zend\OpenId\Discovery\Xrds\Parser\Exception\ParseFailedException', 
             "Couldn't find end of Start Tag XRDS");
 
         $parser = new Parser();

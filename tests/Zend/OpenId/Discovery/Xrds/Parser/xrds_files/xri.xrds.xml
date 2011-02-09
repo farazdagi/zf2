@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XRDS ref="xri://=drummond" xmlns="xri://$xrds">
+ <XRD version="2.0" xmlns="xri://$xrd*($v*2.0)">
+  <Query>*drummond</Query>
+  <Status ceid="off" cid="verified" code="100"/>
+  <ServerStatus code="100"/>
+  <Expires>2011-02-08T09:27:50.000Z</Expires>
+  <ProviderID>xri://=</ProviderID>
+  <LocalID>!f83.62b1.44f.2813</LocalID>
+  <CanonicalID>=!F83.62B1.44F.2813</CanonicalID>
+  <Service priority="10">
+   <ProviderID>xri://!!1008</ProviderID>
+   <Type select="true">xri://+i-service*(+contact)*($v*1.0)</Type>
+   <Type match="default" select="false"/>
+   <Path select="true">(+contact)</Path>
+   <Path match="null" select="false"/>
+   <URI append="qxri" priority="1">http://1id.com/contact/</URI>
+  </Service>
+  <Service priority="20">
+   <ProviderID>xri://!!1008</ProviderID>
+   <Type select="true">http://openid.net/signon/1.0</Type>
+   <URI append="none" priority="20">https://1id.com/sso/</URI>
+   <URI append="none" priority="10">http://1id.com/sso/</URI>
+  </Service>
+  <Service priority="10">
+   <ProviderID>xri://!!1008</ProviderID>
+   <Type select="true">xri://+i-service*(+forwarding)*($v*1.0)</Type>
+   <Type match="null" select="false"/>
+   <URI append="qxri" priority="1">http://1id.com/</URI>
+  </Service>
+  <Service priority="10">
+   <Path select="true">skype/call</Path>
+   <URI append="none" priority="10">skype:drummondreed?call</URI>
+  </Service>
+  <Service priority="10">
+   <Path select="true">skype/chat</Path>
+   <URI append="none" priority="10">skype:drummondreed?chat</URI>
+  </Service>
+ </XRD>
+</XRDS>
