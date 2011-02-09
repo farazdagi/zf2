@@ -21,16 +21,17 @@
 /**
  * @namespace
  */
-namespace Zend\OpenId\Discovery\Xrds\Exception;
+namespace Zend\OpenId\Discovery\Xrds\Parser;
 
 /**
+ * Exception class for Zend\OpenId\Discovery\Xrds\Parser
+ *
  * @category   Zend
- * @package    Zend_OpenId
- * @uses       \Zend\OpenId\Discovery\Service\Exception
+ * @package    Zend_OpenId_Discovery
+ * @uses       \Zend\OpenId\Discovery\Xrds\Exception
  * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class ParseFailedException
-    extends \RuntimeException
-    implements \Zend\OpenId\Discovery\Xrds\Exception
+interface Exception
+    extends \Zend\OpenId\Discovery\Xrds\Exception
 {}
