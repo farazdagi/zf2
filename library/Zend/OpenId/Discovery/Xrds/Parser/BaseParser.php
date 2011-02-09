@@ -26,7 +26,7 @@ namespace Zend\OpenId\Discovery\Xrds\Parser;
 use Zend\OpenId,
     Zend\OpenId\Discovery\Xrds,
     Zend\OpenId\Discovery\Xrds\Element,
-    Zend\OpenId\Discovery\Xrds\Exception\ParseFailedException as ParseFailed;
+    Zend\OpenId\Discovery\Xrds\Parser\Exception;
 
 /**
  * Default XRDS Parser Implementation
@@ -83,6 +83,8 @@ abstract class BaseParser
                 $descriptor->setStatus($statusCode);
             }
         }
+
+        return $descriptor;
     }
 
     /**
@@ -138,7 +140,7 @@ abstract class BaseParser
             foreach(libxml_get_errors() as $error) {
                 $msg .= "\t" . $error->message;
             }
-            throw new ParseFailed($msg);
+            throw new Exception\ParseFailedException($msg);
         }
         return $tree;
     }
@@ -152,10 +154,12 @@ abstract class BaseParser
     {
         if ($el->XRD->count()) {
             return $el->XRD;
-        } else if ($el->XRDS->XRD->count()) {
+        } else if ($el->XRDS->count() && $el->XRDS->XRD->count()) {
             return $el->XRDS->XRD;
+        } else if ($el->Service) { // XRD as root element
+            return $el;
         } else {
-            throw Exception\ElementNotFound("XRD element cannot be located in input XRDS");
+            throw new Exception\ElementNotFoundException("XRD element cannot be located in input XRDS");
         }
     }
 
@@ -166,10 +170,12 @@ abstract class BaseParser
      */
     private function extractServices(\SimpleXMLElement $el)
     {
-        if ($el->XRD->count() && $el->XRD->Service->count()) {
+        if ($el->Service->count()) {
+            return $el->Service;
+        } else if ($el->XRD->count() && $el->XRD->Service->count()) {
             return $el->XRD->Service;
-        } else if ($el->XRDS->XRD->count() && $el->XRDS->XRD->Service->count()) {
-            return $el->XRDS->XRD->Service;
+        //} else if ($el->XRDS->count() && $el->XRDS->XRD->count() && $el->XRDS->XRD->Service->count()) {
+            //return $el->XRDS->XRD->Service;
         } else {
             return array();
         }
