@@ -187,6 +187,13 @@ interface ServiceEndpoint
     public function setPriority($priority);
 
     /**
+     * Get service priority
+     *
+     * @return int
+     */
+    public function getPriority();
+
+    /**
      * Extract OpenID protocol version from server types
      *
      * @return string OpenID protocol version
@@ -194,11 +201,22 @@ interface ServiceEndpoint
     public function getProtocolVersion();
 
     /**
-     * Get service priority
+     * OP-Local Identifier or Delegate. 
      *
-     * @return int
+     * If what user provided is not OP Identifier, then OP-Local Identifier is also 
+     * returned as a part of discovered info.
+     *
+     * @param string $id OP-Local Identifier
+     * @return \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint
      */
-    public function getPriority();
+    public function setLocalIdentifier($id = null);
+
+    /**
+     * Get OP-Local Identifier (if applicable)
+     *
+     * @return string
+     */
+    public function getLocalIdentifier();
 
     /**
      * String uniquely identifying the service object

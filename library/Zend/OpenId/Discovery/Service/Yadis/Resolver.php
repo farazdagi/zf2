@@ -284,6 +284,7 @@ class Resolver
             throw Exception\UnableToLocateServiceException();
         }
 
+        return $service;
     }
 
     /**
