@@ -24,6 +24,7 @@
  */
 namespace Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint;
 use Zend\OpenId,
+    Zend\OpenId\Discovery,
     Zend\OpenId\Discovery\Xrds\Element;
 
 /**
@@ -246,6 +247,26 @@ abstract class BaseServiceEndpoint
     public function getPriority()
     {
         return $this->priority;
+    }
+
+    /**
+     * Extract OpenID protocol version from server types
+     *
+     * @return string OpenID protocol version
+     */
+    public function getProtocolVersion()
+    {
+        $types = array(
+            Discovery\Information::OPENID_20,
+            Discovery\Information::OPENID_11,
+            Discovery\Information::OPENID_10,
+        );
+        foreach ($types as $type) {
+            if ($this->hasType($type)) {
+                return $type;
+            }
+        }
+        return null;
     }
 
     /**
