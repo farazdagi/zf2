@@ -112,7 +112,7 @@ interface Descriptor
      *
      * @param int $status Status to set
      *
-     * @reutrn \Zend\OpenId\Discovery\Xrds\Element\Descriptor
+     * @return \Zend\OpenId\Discovery\Xrds\Element\Descriptor
      */
     public function setStatus($status);
 
