@@ -122,6 +122,11 @@ abstract class BaseParser
             $service->setPriority(0);
         }
 
+        // OP Local Id
+        if ((string)$el->LocalID) {
+            $service->setLocalIdentifier((string)$el->LocalID);
+        }
+
         return $service;
     }
 
