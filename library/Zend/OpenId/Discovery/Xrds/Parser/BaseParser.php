@@ -118,6 +118,8 @@ abstract class BaseParser
         // priority
         if ((string)$attr->priority) {
             $service->setPriority((string)$attr->priority);
+        } else {
+            $service->setPriority(0);
         }
 
         return $service;
