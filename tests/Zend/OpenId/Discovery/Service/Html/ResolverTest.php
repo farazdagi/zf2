@@ -48,7 +48,7 @@ class DiscoveryTest extends \PHPUnit_Framework_TestCase
     const OP_ENDPOINT = "http://www.myopenid.com/";
 
     /**
-     * @var \Zend\OpenId\Discovery\Information
+     * @var \Zend\OpenId\Discovery\Service
      */
     private $service;
 
