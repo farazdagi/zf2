@@ -187,6 +187,13 @@ interface ServiceEndpoint
     public function setPriority($priority);
 
     /**
+     * Extract OpenID protocol version from server types
+     *
+     * @return string OpenID protocol version
+     */
+    public function getProtocolVersion();
+
+    /**
      * Get service priority
      *
      * @return int
