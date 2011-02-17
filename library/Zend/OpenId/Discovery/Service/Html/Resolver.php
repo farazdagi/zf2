@@ -82,7 +82,6 @@ class Resolver
         $client = $this->getHttpClient();
         if ($client === null) {
             throw new Exception\DependencyMissingException('HTTP client must be injected');
-        } else {
         }
 
         try {
