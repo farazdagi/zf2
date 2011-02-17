@@ -56,6 +56,13 @@ abstract class BaseServiceEndpoint
     private $priority;
 
     /**
+     * Get OP-Local Identifier (if applicable)
+     *
+     * @var string
+     */
+    private $localIdentifier;
+
+    /**
      * Add service type
      *
      * @param string $type Type of service being described
@@ -267,6 +274,31 @@ abstract class BaseServiceEndpoint
             }
         }
         return null;
+    }
+
+    /**
+     * OP-Local Identifier or Delegate. 
+     *
+     * If what user provided is not OP Identifier, then OP-Local Identifier is also 
+     * returned as a part of discovered info.
+     *
+     * @param string $id OP-Local Identifier
+     * @return \Zend\OpenId\Discovery\Xrds\Element\ServiceEndpoint
+     */
+    public function setLocalIdentifier($id = null)
+    {
+        $this->localIdentifer = $id;
+        return $this;
+    }
+
+    /**
+     * Get OP-Local Identifier (if applicable)
+     *
+     * @return string
+     */
+    public function getLocalIdentifier()
+    {
+        return $this->localIdentifier;
     }
 
     /**
