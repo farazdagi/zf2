@@ -22,37 +22,16 @@
 /**
  * @namespace
  */
-namespace Zend\OpenId;
+namespace Zend\OpenId\Exception;
 
 /**
- * Exception class for Zend\OpenId
- *
- * @uses       \Exception
  * @category   Zend
  * @package    Zend_OpenId
  * @copyright  Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
+ * @uses       \Zend\OpenId\Exception
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class Exception extends \Exception
-{
-
-    /**
-     * The specified digest algotithm is not supported by this PHP installation
-     */
-    const UNSUPPORTED_DIGEST    = 1;
-
-    /**
-     * The long math arithmetick is not supported by this PHP installation
-     */
-    const UNSUPPORTED_LONG_MATH = 2;
-
-    /**
-     * Internal long math arithmetic error
-     */
-    const ERROR_LONG_MATH       = 3;
-
-    /**
-     * Iternal storage error
-     */
-    const ERROR_STORAGE         = 4;
-}
+class RuntimeException
+    extends \RuntimeException
+    implements \Zend\OpenId\Exception
+{}
