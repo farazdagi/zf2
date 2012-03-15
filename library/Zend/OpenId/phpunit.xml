@@ -1,0 +1,19 @@
+<phpunit bootstrap="../../../tests/Bootstrap.php" colors="true">
+    <testsuites>
+        <testsuite name="Zend Framework Test Suite">
+            <directory>../../../tests/Zend</directory>
+        </testsuite>
+    </testsuites>
+
+    <groups>
+        <exclude>
+            <group>disable</group>
+            <group>Zend_Search_Lucene</group>
+        </exclude>
+    </groups>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">../../../library/Zend/OpenId</directory>
+        </whitelist>
+    </filter>
+</phpunit>
