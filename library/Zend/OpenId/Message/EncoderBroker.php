@@ -28,7 +28,7 @@ use Zend\Loader\PluginBroker,
     Zend\OpenId\Exception;
 
 /**
- * Broker for message encoder instances
+ * Broker for Message\Encoder instances
  *
  * @category   Zend
  * @package    Zend_OpenId

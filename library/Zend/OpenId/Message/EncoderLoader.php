@@ -27,7 +27,7 @@ namespace Zend\OpenId\Message;
 use Zend\Loader\PluginClassLoader;
 
 /**
- * Broker for message encoder instances
+ * Class loader for Message\Encoder instances
  *
  * @category   Zend
  * @package    Zend_OpenId
