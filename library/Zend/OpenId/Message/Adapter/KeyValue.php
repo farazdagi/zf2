@@ -15,29 +15,32 @@
  * @category   Zend
  * @package    Zend_OpenId
  * @subpackage Zend_OpenId_Message
- * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 
 /**
  * @namespace
  */
-namespace Zend\OpenId\Message\Container;
-use Zend\OpenId;
+namespace Zend\OpenId\Message\Adapter;
+
+use Zend\OpenId\Message,
+    Zend\OpenId\Message\Message as MessageService;
 
 /**
- * Message container - implements message encoding/format defined in Section 4 
- * of the {@link http://openid.net/specs/openid-authentication-2_0.html 
- * OpenID 2.0 Specification}. In addition to formats provided by specs, 
- * additional format (TYPE_ARRAY) is added to facilitate development.
+ * KeyValue Message
  *
  * @category   Zend
  * @package    Zend_OpenId
  * @subpackage Zend_OpenId_Message
- * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class Standard
-    extends OpenId\Message\Container
-    implements OpenId\Message
-{}
+class KeyValue extends BaseAdapter implements Message\Adapter
+{
+    public function __construct()
+    {
+        $broker = MessageService::getEncoderBroker();
+        $this->setEncoder($broker->load(Message\Encoder::TYPE_KEYVALUE));
+    }
+}
