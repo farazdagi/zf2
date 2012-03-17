@@ -24,10 +24,11 @@
  */
 namespace Zend\OpenId\Message;
 
-use Zend\OpenId\Exception;
+use Zend\Loader\PluginBroker,
+    Zend\OpenId\Exception;
 
 /**
- * Facade to OpenId\Message package.
+ * Broker for message encoder instances
  *
  * @category   Zend
  * @package    Zend_OpenId
@@ -35,41 +36,30 @@ use Zend\OpenId\Exception;
  * @copyright  Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class Message
+class EncoderBroker extends PluginBroker
 {
     /**
-     * @var EncoderBroker
+     * @var string Default plugin loading strategy
      */
-    protected static $encoderBroker;
+    protected $defaultClassLoader = 'Zend\OpenId\Message\EncoderLoader';
 
     /**
-     * Set encoder broker
-     *
-     * @param  EncoderBroker $broker
-     * @return void
+     * @var boolean Encoders must not be registred on load
      */
-    public static function setEncoderBroker($broker)
-    {
-        if (!$broker instanceof EncoderBroker) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                'Encoder broker must extend EncoderBroker; received "%s"',
-                (is_object($broker) ? get_class($broker) : gettype($broker))
-            ));
-        }
-        self::$encoderBroker = $broker;
-    }
+    protected $registerPluginsOnLoad = false;
 
     /**
-     * Get encoder broker. Create if doesn't exist.
+     * Validate that we have valid encoder
      *
-     * @return EncoderBroker
+     * @param  mixed $plugin
+     * @return true
+     * @throws Exception
      */
-    public static function getEncoderBroker()
+    protected function validatePlugin($plugin)
     {
-        if (null === self::$encoderBroker) {
-            self::setEncoderBroker(new EncoderBroker());
+        if (!$plugin instanceof Encoder) {
+            throw new Exception\InvalidArgumentException('Message encoders must implement Zend\OpenId\Message\Encoder');
         }
-
-        return self::$encoderBroker;
+        return true;
     }
 }

@@ -24,10 +24,10 @@
  */
 namespace Zend\OpenId\Message;
 
-use Zend\OpenId\Exception;
+use Zend\Loader\PluginClassLoader;
 
 /**
- * Facade to OpenId\Message package.
+ * Broker for message encoder instances
  *
  * @category   Zend
  * @package    Zend_OpenId
@@ -35,41 +35,14 @@ use Zend\OpenId\Exception;
  * @copyright  Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class Message
+class EncoderLoader extends PluginClassLoader
 {
     /**
-     * @var EncoderBroker
+     * @var array Pre-defined aliases
      */
-    protected static $encoderBroker;
-
-    /**
-     * Set encoder broker
-     *
-     * @param  EncoderBroker $broker
-     * @return void
-     */
-    public static function setEncoderBroker($broker)
-    {
-        if (!$broker instanceof EncoderBroker) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                'Encoder broker must extend EncoderBroker; received "%s"',
-                (is_object($broker) ? get_class($broker) : gettype($broker))
-            ));
-        }
-        self::$encoderBroker = $broker;
-    }
-
-    /**
-     * Get encoder broker. Create if doesn't exist.
-     *
-     * @return EncoderBroker
-     */
-    public static function getEncoderBroker()
-    {
-        if (null === self::$encoderBroker) {
-            self::setEncoderBroker(new EncoderBroker());
-        }
-
-        return self::$encoderBroker;
-    }
+    protected $plugins = array(
+        Encoder::TYPE_KEYVALUE  => 'Zend\OpenId\Message\Encoder\KeyValue',
+        Encoder::TYPE_HTTP      => 'Zend\OpenId\Message\Encoder\Http',
+        Encoder::TYPE_ARRAY     => 'Zend\OpenId\Message\Encoder\AsArray',
+    );
 }
