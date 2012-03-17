@@ -54,9 +54,9 @@ class EncoderBrokerTest extends TestCase
 
     public function testBrokerSettingOk()
     {
-        MessageService::setEncoderBroker(new CustomBroker);
+        MessageService::setEncoderBroker(new CustomEncoderBroker);
         $broker = MessageService::getEncoderBroker();
-        $this->assertInstanceOf('ZendTest\OpenId\Message\CustomBroker', $broker);
+        $this->assertInstanceOf('ZendTest\OpenId\Message\CustomEncoderBroker', $broker);
     }
 
     public function testBrokerSettingInvalidArgumentException()
@@ -97,7 +97,7 @@ class EncoderBrokerTest extends TestCase
     }
 }
 
-class CustomBroker extends Message\EncoderBroker
+class CustomEncoderBroker extends Message\EncoderBroker
 {}
 
 
