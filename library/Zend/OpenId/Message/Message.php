@@ -38,9 +38,45 @@ use Zend\OpenId\Exception;
 class Message
 {
     /**
+     * @var AdapterBroker
+     */
+    protected static $adapterBroker;
+
+    /**
      * @var EncoderBroker
      */
     protected static $encoderBroker;
+
+    /**
+     * Set adapter broker
+     *
+     * @param  AdapterBroker $broker
+     * @return void
+     */
+    public static function setAdapterBroker($broker)
+    {
+        if (!$broker instanceof AdapterBroker) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                'Adapter broker must extend AdapterBroker; received "%s"',
+                (is_object($broker) ? get_class($broker) : gettype($broker))
+            ));
+        }
+        self::$adapterBroker = $broker;
+    }
+
+    /**
+     * Get adapter broker. Create if doesn't exist.
+     *
+     * @return AdapterBroker
+     */
+    public static function getAdapterBroker()
+    {
+        if (null === self::$adapterBroker) {
+            self::setAdapterBroker(new AdapterBroker());
+        }
+
+        return self::$adapterBroker;
+    }
 
     /**
      * Set encoder broker
