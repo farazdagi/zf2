@@ -15,33 +15,33 @@
  * @category   Zend
  * @package    Zend_OpenId
  * @subpackage Zend_OpenId_Message
- * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 
 /**
  * @namespace
  */
-namespace Zend\OpenId\Message\Encoding;
-use Zend\OpenId, 
-    Zend\OpenId\Message;
+namespace Zend\OpenId\Message\Encoder;
+
+use Zend\OpenId\Message;
 
 /**
  * HTTP message encoding strategy as outlined in section 4.1.2 of
- * {@link http://openid.net/specs/openid-authentication-2_0.html 
- * OpenID 2.0 Specification}. 
+ * {@link http://openid.net/specs/openid-authentication-2_0.html OpenID 2.0 Specification}.
  *
  * @category   Zend
  * @package    Zend_OpenId
  * @subpackage Zend_OpenId_Message
- * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class Http
-    implements OpenId\Message\Encoding
+class Http implements Message\Encoder
 {
     /**
      * Encode array of items into string acc. to concrete encoding algorithm
+     *
+     * x-www-urlencoded, as in a HTTP POST body or in a URL's query string ([RFC3986] section 3)
      *
      * @return string
      */
@@ -49,7 +49,7 @@ class Http
     {
         $pairs = array();
         foreach ($items as $key => $value) {
-            $pairs[] = sprintf("%s=%s", urlencode($key), urlencode($value)); 
+            $pairs[] = sprintf("openid.%s=%s", rawurlencode($key), rawurlencode($value));
         }
 
         return implode('&', $pairs);
@@ -67,7 +67,7 @@ class Http
         foreach ($pairs as $pair) {
             if (trim($pair) !== '' && strpos($pair, '=') !== false) {
                 list($key, $value) = explode('=', $pair, 2);
-                $items[urldecode($key)] = urldecode($value);
+                $items[str_replace('openid.', '', rawurldecode($key))] = rawurldecode($value);
             }
         }
         return $items;

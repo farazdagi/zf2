@@ -15,30 +15,29 @@
  * @category   Zend
  * @package    Zend_OpenId
  * @subpackage Zend_OpenId_Message
- * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 
 /**
  * @namespace
  */
-namespace Zend\OpenId\Message\Encoding;
-use Zend\OpenId, 
-    Zend\OpenId\Message;
+namespace Zend\OpenId\Message\Encoder;
+
+use Zend\OpenId\Message;
 
 /**
  * KeyValue message encoding strategy as outlined in section 4.1.1 of
- * {@link http://openid.net/specs/openid-authentication-2_0.html 
- * OpenID 2.0 Specification}. 
+ * {@link http://openid.net/specs/openid-authentication-2_0.html
+ * OpenID 2.0 Specification}.
  *
  * @category   Zend
  * @package    Zend_OpenId
  * @subpackage Zend_OpenId_Message
- * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class KeyValue
-    implements OpenId\Message\Encoding
+class KeyValue implements Message\Encoder
 {
     /**
      * Encode array of items into string acc. to concrete encoding algorithm
@@ -49,7 +48,7 @@ class KeyValue
     {
         $message = '';
         foreach ($items as $key => $value) {
-            $message .= sprintf("%s:%s\n", $key, $value); 
+            $message .= sprintf("%s:%s\n", $key, $value);
         }
 
         return $message;

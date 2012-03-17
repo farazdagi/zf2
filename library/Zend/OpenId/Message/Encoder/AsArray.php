@@ -15,16 +15,16 @@
  * @category   Zend
  * @package    Zend_OpenId
  * @subpackage Zend_OpenId_Message
- * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 
 /**
  * @namespace
  */
-namespace Zend\OpenId\Message\Encoding;
-use Zend\OpenId, 
-    Zend\OpenId\Message;
+namespace Zend\OpenId\Message\Encoder;
+
+use Zend\OpenId\Message;
 
 /**
  * Array message encoding strategy. This is an auxilary format to ease development.
@@ -32,11 +32,10 @@ use Zend\OpenId,
  * @category   Zend
  * @package    Zend_OpenId
  * @subpackage Zend_OpenId_Message
- * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-class AsArray
-    implements OpenId\Message\Encoding
+class AsArray implements Message\Encoder
 {
     /**
      * Encode array of items into string acc. to concrete encoding algorithm
@@ -55,7 +54,7 @@ class AsArray
      */
     public function decode($data)
     {
-        return $data; // since nothing has been done in encoding stage
-                      // nothing is donw on decode
+        return $data; // since nothing has been done during encoding stage
+                      // nothing is done on decoding
     }
 }

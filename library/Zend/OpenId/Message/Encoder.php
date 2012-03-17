@@ -15,7 +15,7 @@
  * @category   Zend
  * @package    Zend_OpenId
  * @subpackage Zend_OpenId_Message
- * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 
@@ -23,36 +23,41 @@
  * @namespace
  */
 namespace Zend\OpenId\Message;
+
 use Zend\OpenId;
 
 /**
- * Message encoding/format defined in Section 4 of the 
- * {@link http://openid.net/specs/openid-authentication-2_0.html 
- * OpenID 2.0 Specification}. In addition to formats provided by specs, 
- * additional format (TYPE_ARRAY) is added to facilitate development.
+ * Defines encoding/format of a protocol message described in Section 4 of the
+ * {@link http://openid.net/specs/openid-authentication-2_0.html
+ * OpenID 2.0 Specification}. In addition to formats provided by specs,
+ * additional format (TYPE_ARRAY) is added to facilitate testing.
  *
  * @category   Zend
  * @package    Zend_OpenId
  * @subpackage Zend_OpenId_Message
- * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
-interface Encoding
+interface Encoder
 {
-    const TYPE_ARRAY = 1;
-    const TYPE_KEYVALUE = 2;
-    const TYPE_HTTP = 4;
+    /**
+     * Available encodings
+     */
+    const TYPE_KEYVALUE = 'keyvalue';
+    const TYPE_HTTP     = 'http';
+    const TYPE_ARRAY    = 'array';
 
     /**
      * Encode array of items into string acc. to concrete encoding algorithm
      *
-     * @return string|array String for actual algorithms (KeyValue and Http) 
-     * and array for debugging algorithm (AsArray)
+     * @return string|array String for actual algorithms (KeyValue and Http) and array for debugging algorithm (AsArray)
      */
     public function encode($items);
 
     /**
      * Parse incoming data into array
+     *
+     * @param string $data Message to decode
      *
      * @return array
      */
